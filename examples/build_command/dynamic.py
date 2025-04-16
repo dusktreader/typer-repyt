@@ -1,36 +1,16 @@
-# Quickstart
-
-## Requirements
-
-* Python 3.12 to 3.13
-
-
-## Installation
-
-### Install from pypi:
-
-This will install the latest release from pypi via pip:
-
-```bash
-pip install typer-repyt
-```
-
-
-## Using
-
-Just import, and build!
-
-```python
 from typer import Typer
-from typer_repyt import build_command
+from typer_repyt import build_command, OptDef, ArgDef
+
 
 cli = Typer()
 
+
 def dynamic(dyna1: str, dyna2: int, mite1: str, mite2: int | None):
-    '''
+    """
     Just prints values of passed params
-    '''
+    """
     print(f"{dyna1=}, {dyna2=}, {mite1=}, {mite2=}")
+
 
 build_command(
     cli,
@@ -43,4 +23,3 @@ build_command(
 
 if __name__ == "__main__":
     cli()
-```

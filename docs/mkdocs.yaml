@@ -1,6 +1,6 @@
-site_name: typer-attach documentation
-site_url: http://dusktreader.github.io/typer-attach
-repo_url: https://github.com/dusktreader/typer-attach
+site_name: typer-repyt documentation
+site_url: http://dusktreader.github.io/typer-repyt
+repo_url: https://github.com/dusktreader/typer-repyt
 docs_dir: source
 theme:
   name: material
@@ -8,7 +8,7 @@ theme:
     - navigation.expand
     - content.code.copy
   font:
-    code: Fira Code
+    code: Source Code Pro
   features:
     - navigation.expand
     - navigation.footer
@@ -28,11 +28,12 @@ theme:
         icon: material/brightness-7
         name: Switch to light mode
 watch:
-  - ../src/typer_attach
+  - ../src/typer_repyt
 nav:
   - Home: index.md
   - Quickstart: quickstart.md
-  - Features: features.md
+  - Features:
+    - Dynamic Commands: features/build_command.md
   - Reference: reference.md
 plugins:
   search:
@@ -60,3 +61,5 @@ markdown_extensions:
   - pymdownx.details:
   - admonition:
   - attr_list:
+extra_css:
+  - css/fonts.css

@@ -1,7 +1,7 @@
 .ONESHELL:
 .DEFAULT_GOAL:=help
 SHELL:=/bin/bash
-PACKAGE_TARGET:=src/typer_attach
+PACKAGE_TARGET:=src/typer_repyt
 
 
 # ==== Helpers =========================================================================================================
@@ -58,3 +58,14 @@ docs/build:  ## Build the documentation
 .PHONY: docs/serve
 docs/serve:  ## Build the docs and start a local dev server
 	uv run mkdocs serve --config-file=docs/mkdocs.yaml --dev-addr=localhost:10000
+
+
+# ==== App Commands ====================================================================================================
+.PHONY: app/run
+app/run:  ## Run the app in debug mode
+	uv run src/typer_repyt/command_builder.py
+
+.PHONY: app/debug
+app/debug:  ## Run the app in debug mode
+	uv run debugpy --listen localhost:5678 --wait-for-client src/typer_repyt/command_builder.py
+

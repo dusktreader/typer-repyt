@@ -1,7 +1,7 @@
 [project]
-name = "typer-attach"
-version = "0.1.0"
-description = "Tools to attach extended functionality to typer commands"
+name = "typer-repyt"
+version = "0.2.0"
+description = "Tools to extended functionality for typer based CLIs"
 authors = [
     {name = "Tucker Beck", email ="tucker.beck@gmail.com"},
 ]
@@ -9,18 +9,23 @@ readme = "README.md"
 license-files = ["LICENSE.md"]
 
 requires-python = ">=3.12, ~=3.13"
-dependencies = []
+dependencies = [
+    "py-buzz>=7.0.0",
+    "snick~=2.1",
+    "typer>=0.15.2",
+]
 
 
 [project.urls]
-homepage = "https://github.com/dusktreader/typer-attach"
-source = "https://github.com/dusktreader/typer-attach"
-changelog = "https://github.com/dusktreader/typer-attach/blob/main/CHANGELOG.md"
+homepage = "https://github.com/dusktreader/typer-repyt"
+source = "https://github.com/dusktreader/typer-repyt"
+changelog = "https://github.com/dusktreader/typer-repyt/blob/main/CHANGELOG.md"
 
 
 [dependency-groups]
 dev = [
     "basedpyright~=1.28",
+    "debugpy~=1.8",
     "ipython~=8.18",
     "mkdocs-material~=9.6",
     "mkdocstrings[python]~=0.29",
@@ -43,7 +48,7 @@ package = true
 [tool.pytest.ini_options]
 addopts = [
     "--random-order",
-    "--cov=src/typer_attach",
+    "--cov=src/typer_repyt",
     "--cov-report=term-missing",
     "--cov-fail-under=85",
     "--cov-report=xml:.coverage.xml",
@@ -54,12 +59,12 @@ addopts = [
 
 [tool.ruff]
 line-length = 120
-src = ["src/typer_attach", "tests"]
+src = ["src/typer_repyt", "tests"]
 
 
 [tool.mypy]
 pretty = true
-files = ["src/typer_attach", "tests"]
+files = ["src/typer_repyt", "tests"]
 
 
 [[tool.mypy.overrides]]
@@ -78,7 +83,7 @@ extend-ignore-identifiers-re = []
 
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/typer_attach"]
+packages = ["src/typer_repyt"]
 
 
 [build-system]

@@ -7,10 +7,10 @@ on:
       - main
     paths:
       - 'docs/**'
-      - 'src/typer_attach/**'
+      - 'src/typer_repyt/**'
 
 jobs:
-  build:
+  docs:
     runs-on: ubuntu-latest
     permissions:
       contents: write

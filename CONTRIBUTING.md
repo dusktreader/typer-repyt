@@ -11,13 +11,13 @@ Before any further discussion, a point about security needs to be addressed:
 
 ## Thanks!
 
-First, thank you for your interest in contributing to typer-attach! Even though this is mostly a personal project,
+First, thank you for your interest in contributing to typer-repyt! Even though this is mostly a personal project,
 it takes a bit of work to keep it maintained. All contributions help and improve it.
 
 
 ## Contact Us
 
-The maintainers of typer-attach can be reached most easily via email:
+The maintainers of typer-repyt can be reached most easily via email:
 
 * **Tucker Beck**: [tucker.beck@gmail.com](mailto:tucker.beck@gmail.com)
 
@@ -25,7 +25,7 @@ The maintainers of typer-attach can be reached most easily via email:
 ## Conduct
 
 Everyone's conduct should be respectful and friendly. For most folks, these things don't need to be spelled out.
-However, to establish a baseline of acceptable conduct, the typer-attach project expects contributors to adhere to
+However, to establish a baseline of acceptable conduct, the typer-repyt project expects contributors to adhere to
 the [Code of Conduct](./CONDUCT.md) for this project. Any issues working with other contributors should be reported to
 the maintainers
 
@@ -68,7 +68,7 @@ Also:
 ```
 
 > [!Note]
-> The maintainers of typer-attach _hate_ the use of `!` to indicate breaking changes in the subject line. If you
+> The maintainers of typer-repyt _hate_ the use of `!` to indicate breaking changes in the subject line. If you
 > introduce a breaking change, please note it in a _footer_ instead.
 
 Code contributions should follow best-practices where possible. Use the
@@ -90,7 +90,7 @@ Packages should only be added to the dependency lists if:
 
 Help with documentation is *always* welcome.
 
-The typer-attach project uses [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) for document
+The typer-repyt project uses [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) for document
 generation.
 
 Documentation lives in the `docs` subdirectory.
@@ -105,7 +105,7 @@ the bulk of it should be be presented as docstrings that use
 and classes.
 
 > [!Note]
-> The maintainers of typer-attach don't like starting the docstring on the same line as the triple-quotes.
+> The maintainers of typer-repyt don't like starting the docstring on the same line as the triple-quotes.
 > Instead, the > docstring should stat on a new line:
 >
 > ```python

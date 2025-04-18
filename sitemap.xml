@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>http://dusktreader.github.io/typer-attach/</loc>
-         <lastmod>2025-04-16</lastmod>
+         <loc>http://dusktreader.github.io/typer-repyt/</loc>
+         <lastmod>2025-04-18</lastmod>
     </url>
     <url>
-         <loc>http://dusktreader.github.io/typer-attach/features/</loc>
-         <lastmod>2025-04-16</lastmod>
+         <loc>http://dusktreader.github.io/typer-repyt/quickstart/</loc>
+         <lastmod>2025-04-18</lastmod>
     </url>
     <url>
-         <loc>http://dusktreader.github.io/typer-attach/quickstart/</loc>
-         <lastmod>2025-04-16</lastmod>
+         <loc>http://dusktreader.github.io/typer-repyt/reference/</loc>
+         <lastmod>2025-04-18</lastmod>
     </url>
     <url>
-         <loc>http://dusktreader.github.io/typer-attach/reference/</loc>
-         <lastmod>2025-04-16</lastmod>
+         <loc>http://dusktreader.github.io/typer-repyt/features/build_command/</loc>
+         <lastmod>2025-04-18</lastmod>
     </url>
 </urlset>

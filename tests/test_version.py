@@ -1,7 +1,7 @@
 from importlib.metadata import PackageNotFoundError
 from unittest import mock
 
-from typer_attach.version import (
+from typer_repyt.version import (
     __version__,
     get_version,
     get_version_from_metadata,
@@ -20,12 +20,10 @@ def test_get_version_from_pyproject():
 def test_get_version__uses_pyproject():
     expected_version = "1.2.3"
     with mock.patch(
-        "typer_attach.version.get_version_from_metadata",
-        side_effect=PackageNotFoundError
+        "typer_repyt.version.get_version_from_metadata", side_effect=PackageNotFoundError
     ) as mocked_metadata:
         with mock.patch(
-            "typer_attach.version.get_version_from_pyproject",
-            return_value=expected_version
+            "typer_repyt.version.get_version_from_pyproject", return_value=expected_version
         ) as mocked_pyproject:
             computed_version = get_version()
             assert computed_version == expected_version
@@ -36,13 +34,9 @@ def test_get_version__uses_pyproject():
 
 def test_get_version__uses_metadata():
     expected_version = "1.2.3"
-    with mock.patch(
-        "typer_attach.version.get_version_from_metadata",
-        return_value=expected_version
-    ) as mocked_metadata:
+    with mock.patch("typer_repyt.version.get_version_from_metadata", return_value=expected_version) as mocked_metadata:
         with mock.patch(
-            "typer_attach.version.get_version_from_pyproject",
-            side_effect=FileNotFoundError
+            "typer_repyt.version.get_version_from_pyproject", side_effect=FileNotFoundError
         ) as mocked_pyproject:
             computed_version = get_version()
             assert computed_version == expected_version
@@ -54,16 +48,13 @@ def test_get_version__uses_metadata():
 def test_get_version__returns_unknown_if_both_fail():
     expected_version = "unknown"
     with mock.patch(
-        "typer_attach.version.get_version_from_metadata",
-        side_effect=PackageNotFoundError
+        "typer_repyt.version.get_version_from_metadata", side_effect=PackageNotFoundError
     ) as mocked_metadata:
         with mock.patch(
-            "typer_attach.version.get_version_from_pyproject",
-            side_effect=FileNotFoundError
+            "typer_repyt.version.get_version_from_pyproject", side_effect=FileNotFoundError
         ) as mocked_pyproject:
             computed_version = get_version()
             assert computed_version == expected_version
 
             mocked_metadata.assert_called_once()
             mocked_pyproject.assert_called_once()
-

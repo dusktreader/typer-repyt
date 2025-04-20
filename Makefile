@@ -27,19 +27,22 @@ clean:  ## Clean up build artifacts and other junk
 
 
 # ==== Quality Control =================================================================================================
+.PHONY: qa
+qa: qa/full ## Shortcut to qa/full
+
 .PHONY: qa/test
 qa/test:  ## Run the tests
 	uv run pytest
 
 .PHONY: qa/types
 qa/types:  ## Run static type checks
-	uv run mypy ${PACKAGE_TARGET} tests --pretty
-	uv run basedpyright ${PACKAGE_TARGET} tests
+	uv run mypy ${PACKAGE_TARGET} tests src/typer_repyt_demo --pretty
+	uv run basedpyright ${PACKAGE_TARGET} tests src/typer_repyt_demo
 
 .PHONY: qa/lint
 qa/lint:  ## Run linters
-	uv run ruff check ${PACKAGE_TARGET} tests
-	uv run typos ${PACKAGE_TARGET} tests
+	uv run ruff check ${PACKAGE_TARGET} tests src/typer_repyt_demo
+	uv run typos ${PACKAGE_TARGET} tests src/typer_repyt_demo
 
 .PHONY: qa/full
 qa/full: qa/test qa/lint qa/types  ## Run the full set of quality checks
@@ -47,10 +50,13 @@ qa/full: qa/test qa/lint qa/types  ## Run the full set of quality checks
 
 .PHONY: qa/format
 qa/format:  ## RUn code formatter
-	uv run ruff format ${PACKAGE_TARGET} tests
+	uv run ruff format ${PACKAGE_TARGET} tests src/typer_repyt_demo
 
 
 # ==== Documentation ===================================================================================================
+.PHONY: docs
+docs: docs/build ## Shortcut to docs/build
+
 .PHONY: docs/build
 docs/build:  ## Build the documentation
 	uv run mkdocs build --config-file=docs/mkdocs.yaml
@@ -60,12 +66,14 @@ docs/serve:  ## Build the docs and start a local dev server
 	uv run mkdocs serve --config-file=docs/mkdocs.yaml --dev-addr=localhost:10000
 
 
-# ==== App Commands ====================================================================================================
-.PHONY: app/run
-app/run:  ## Run the app in debug mode
-	uv run src/typer_repyt/command_builder.py
+# ==== Demo Commands ===================================================================================================
+.PHONY: demo
+demo: demo/run  ## Shortcut for demo/run
 
-.PHONY: app/debug
-app/debug:  ## Run the app in debug mode
-	uv run debugpy --listen localhost:5678 --wait-for-client src/typer_repyt/command_builder.py
+.PHONY: demo/run
+demo/run:  ## Run the app in debug mode
+	uv run typer-repyt-demo
 
+.PHONY: demo/debug
+demo/debug:  ## Run the app in debug mode
+	uv run debugpy --listen localhost:5678 --wait-for-client src/typer_repyt_demo/main.py

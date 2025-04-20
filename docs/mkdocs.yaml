@@ -29,11 +29,13 @@ theme:
         name: Switch to light mode
 watch:
   - ../src/typer_repyt
+  - ../examples
 nav:
   - Home: index.md
   - Quickstart: quickstart.md
   - Features:
     - Dynamic Commands: features/build_command.md
+    - Settings: features/settings.md
   - Reference: reference.md
 plugins:
   search:

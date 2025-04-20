@@ -1,19 +1,47 @@
+from collections.abc import Callable
+from functools import wraps
 from typing import Any, Annotated
 
 import pytest
 import typer
 
-from typer_repyt.build_command import build_command, OptDef, ArgDef, ParamDef
-from typer_repyt.exceptions import RepytError
+from typer_repyt.build_command import build_command, OptDef, ArgDef, ParamDef, DecDef
+from typer_repyt.exceptions import BuildCommandError, RepytError
 
 from tests.helpers import check_output, check_help, match_output, match_help
+
+
+def simple_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+    @wraps(func)
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        print("Start simple decorator")
+        result = func(*args, **kwargs)
+        print("End simple decorator")
+        return result
+    return wrapper
+
+
+def complex_decorator(a: str, k: str = "hutt") -> Callable[..., Any]:
+    def _decorate(func: Callable[..., Any]) -> Callable[..., Any]:
+        @wraps(func)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            print(f"Complex decorator args: {a=}, {k=}")
+            print(f"Complex decorator before function call: {args=}, {kwargs=}")
+            result = func(*args, **kwargs)
+            print(f"Complex decorator after function call: {result=}")
+            return result
+        return wrapper
+    return _decorate
 
 
 def test_reference_static_implementation():
     cli = typer.Typer()
 
     @cli.command()
+    @simple_decorator
+    @complex_decorator("jawa", k="ewok")
     def static(  # pyright: ignore[reportUnusedFunction]
+        ctx: typer.Context,  # pyright: ignore[reportUnusedParameter]
         mite1: Annotated[str, typer.Argument(help="This is mighty argument 1")],
         dyna2: Annotated[int, typer.Option(help="This is dynamic option 2")],
         dyna1: Annotated[str, typer.Option(help="This is dynamic option 1")] = "default1",
@@ -31,19 +59,28 @@ def test_reference_static_implementation():
     match_output(cli, "etim", expected_pattern="Error.*Missing option '--dyna2'", exit_code=2)
     match_output(cli, "--dyna2=13", expected_pattern="Error.*Missing argument 'MITE1'", exit_code=2)
 
+    match_output(cli, "--dyna2=13", "17", expected_pattern=[
+        "Start simple decorator",
+        "Complex decorator args: a='jawa', k='ewok'",
+        r"Complex decorator before function call: args=\(\), kwargs={'ctx': .*Context.*, 'mite1': '17', 'dyna2': 13, 'dyna1': 'default1', 'mite2': None}",
+        "dyna1='default1', dyna2=13",
+        "Complex decorator after function call: result=None",
+        "End simple decorator",
+    ])
+
     match_help(
         cli,
         expected_pattern=[
             "Just prints values of passed params",
-            "--dyna1 TEXT This is dynamic option 1 [default: default1]",
-            "--dyna2 INTEGER This is dynamic option2 [default: None] [required]",
-            "mite1 TEXT This is mighty argument 1 [default:None] [required]",
-            "mite2 [MITE2] This is mighty argument 2 [default: None]",
+            r"mite1 TEXT This is mighty argument 1 \[default:None\] \[required\]",
+            r"mite2 \[MITE2\] This is mighty argument 2 \[default: None\]",
+            r"--dyna2 INTEGER This is dynamic option2 \[default: None\] \[required\]",
+            r"--dyna1 TEXT This is dynamic option 1 \[default: default1\]",
         ],
     )
 
 
-def test_build_command__several_params():
+def test_equivalent_dynamic_implementation():
     cli = typer.Typer()
 
     def dynamic(dyna1: str, dyna2: int, mite1: str, mite2: int | None):
@@ -59,21 +96,37 @@ def test_build_command__several_params():
         OptDef(name="dyna2", param_type=int, help="This is dynamic option 2"),
         ArgDef(name="mite1", param_type=str, help="This is mighty argument 1"),
         ArgDef(name="mite2", param_type=int | None, help="This is mighty argument 2", default=None),
+        decorators=[
+            DecDef(simple_decorator),
+            DecDef(complex_decorator, dec_args=["jawa"], dec_kwargs=dict(k="ewok"), is_simple=False),
+        ],
+        include_context=True,
     )
 
     check_output(cli, "--dyna2=13", "17", expected_substring="dyna1='default1', dyna2=13")
-    check_output(cli, "--dyna1=anyd", "--dyna2=13", "etim", expected_substring="dyna1='anyd', dyna2=13, mite1='etim', mite2=None")
+    check_output(
+        cli, "--dyna1=anyd", "--dyna2=13", "etim", expected_substring="dyna1='anyd', dyna2=13, mite1='etim', mite2=None"
+    )
     match_output(cli, "etim", expected_pattern="Error.*Missing option '--dyna2'", exit_code=2)
     match_output(cli, "--dyna2=13", expected_pattern="Error.*Missing argument 'MITE1'", exit_code=2)
+
+    match_output(cli, "--dyna2=13", "17", expected_pattern=[
+        "Start simple decorator",
+        "Complex decorator args: a='jawa', k='ewok'",
+        r"Complex decorator before function call: args=\(\), kwargs={'ctx': .*Context.*, 'dyna2': 13, 'mite1': '17', 'dyna1': 'default1', 'mite2': None}",
+        "dyna1='default1', dyna2=13",
+        "Complex decorator after function call: result=None",
+        "End simple decorator",
+    ])
 
     match_help(
         cli,
         expected_pattern=[
             "Just prints values of passed params",
-            "--dyna1 TEXT This is dynamic option 1 [default: default1]",
-            "--dyna2 INTEGER This is dynamic option 2 [default: None] [required]",
-            "mite1 TEXT This is mighty argument 1 [default: None] [required]",
-            "mite2 [MITE2] This is mighty argument 2 [default: None]",
+            r"mite1 TEXT This is mighty argument 1 \[default:None\] \[required\]",
+            r"mite2 \[MITE2\] This is mighty argument 2 \[default: None\]",
+            r"--dyna2 INTEGER This is dynamic option2 \[default: None\] \[required\]",
+            r"--dyna1 TEXT This is dynamic option 1 \[default: default1\]",
         ],
     )
 
@@ -91,7 +144,7 @@ def test_build_command__option__with_no_help():
     )
 
     check_output(cli, "--dyna=ZOOM", expected_substring="dyna='ZOOM'")
-    match_help(cli, expected_pattern="--dyna TEXT [default: None] [required]")
+    match_help(cli, expected_pattern=r"--dyna TEXT \[default: None\] \[required\]")
 
 
 def test_build_command__option__rich_help_panel():
@@ -107,7 +160,7 @@ def test_build_command__option__rich_help_panel():
     )
 
     check_output(cli, "--dyna=ZOOM", expected_substring="dyna='ZOOM'")
-    match_help(cli, expected_pattern="This is a dynamic option.*--dyna TEXT [default: None] [required]")
+    match_help(cli, expected_pattern=r"This is a dynamic option.*--dyna TEXT \[default: None\] \[required\]")
 
 
 def test_build_command__option__no_show_default():
@@ -123,7 +176,7 @@ def test_build_command__option__no_show_default():
     )
 
     check_output(cli, expected_substring="dyna='ZOOM'")
-    match_help(cli, expected_pattern="--dyna TEXT(?! [default)")
+    match_help(cli, expected_pattern=r"--dyna TEXT(?! \[default)")
 
 
 def test_build_command__option__prompt__default():
@@ -139,7 +192,7 @@ def test_build_command__option__prompt__default():
     )
 
     check_output(cli, expected_substring="dyna='ZOOM'", input="ZOOM")
-    match_help(cli, expected_pattern="--dyna TEXT [default: None] [required]")
+    match_help(cli, expected_pattern=r"--dyna TEXT \[default: None\] \[required\]")
 
 
 def test_build_command__option__prompt__custom():
@@ -155,7 +208,7 @@ def test_build_command__option__prompt__custom():
     )
 
     check_output(cli, expected_substring="dyna='ZOOM'", input="ZOOM\n")
-    match_help(cli, expected_pattern="--dyna TEXT [default: None] [required]")
+    match_help(cli, expected_pattern=r"--dyna TEXT \[default: None\] \[required\]")
 
 
 # TODO: Figure out how to fix this test
@@ -173,7 +226,7 @@ def test_build_command__option__confirmation_prompt():
     )
 
     check_output(cli, expected_substring=["Dyna: ZOOM", "dyna='ZOOM'"], input="ZOOM\nBOOM\n\n\n")
-    check_help(cli, expected_pattern="--dyna TEXT [default: None] [required]")
+    check_help(cli, expected_pattern=r"--dyna TEXT \[default: None\] \[required\]")
 
 
 def test_build_command__option__hide_input():
@@ -189,7 +242,7 @@ def test_build_command__option__hide_input():
     )
 
     check_output(cli, expected_substring="dyna='ZOOM'", input="ZOOM\n")
-    match_help(cli, expected_pattern="--dyna TEXT [default: None] [required]")
+    match_help(cli, expected_pattern=r"--dyna TEXT \[default: None\] \[required\]")
 
 
 def test_build_command__option__override_name():
@@ -205,7 +258,7 @@ def test_build_command__option__override_name():
     )
 
     check_output(cli, "--dyyyna=ZOOM", expected_substring="dyna='ZOOM'")
-    match_help(cli, expected_pattern="--dyyyna TEXT [default: None] [required]")
+    match_help(cli, expected_pattern=r"--dyyyna TEXT \[default: None\] \[required\]")
 
 
 def test_build_command__option__short_name():
@@ -227,7 +280,7 @@ def test_build_command__option__short_name():
 
     # TODO: figure out what the star in the help output means
     # dyna_pattern = "\* -a TEXT [default: None] [required]"
-    match_help(cli, expected_pattern="-d TEXT [default: None] [required]")
+    match_help(cli, expected_pattern=r"-d TEXT \[default: None\] \[required\]")
 
 
 def test_build_command__option__callback():
@@ -286,7 +339,7 @@ def test_build_command__argument__with_no_help():
     )
 
     check_output(cli, "BOOM", expected_substring="mite='BOOM'")
-    match_help(cli, expected_pattern="mite TEXT [default: None] [required]")
+    match_help(cli, expected_pattern=r"mite TEXT \[default: None\] \[required\]")
 
 
 def test_build_command__argument__rich_help_panel():
@@ -302,7 +355,7 @@ def test_build_command__argument__rich_help_panel():
     )
 
     check_output(cli, "BOOM", expected_substring="mite='BOOM'")
-    match_help(cli, expected_pattern="This is a mighty argument.*mite TEXT [default: None] [required]")
+    match_help(cli, expected_pattern=r"This is a mighty argument.*mite TEXT \[default: None\] \[required\]")
 
 
 def test_build_command__argument__no_show_default():
@@ -318,7 +371,7 @@ def test_build_command__argument__no_show_default():
     )
 
     check_output(cli, expected_substring="mite='BOOM'")
-    match_help(cli, expected_pattern="mite [MITE](?! [default)")
+    match_help(cli, expected_pattern=r"mite \[MITE\](?! \[default)")
 
 
 def test_build_command__argument__metavar():
@@ -334,7 +387,7 @@ def test_build_command__argument__metavar():
     )
 
     check_output(cli, "BOOM", expected_substring="mite='BOOM'")
-    match_help(cli, expected_pattern="mite NITRO [default: None] [required]")
+    match_help(cli, expected_pattern=r"mite NITRO \[default: None\] \[required\]")
 
 
 def test_build_command__argument__hidden():
@@ -368,7 +421,7 @@ def test_build_command__argument__envvar__single():
 
     match_output(cli, expected_pattern="Error.*Missing argument 'MITE'", exit_code=2)
     check_output(cli, expected_substring="mite='BOOM'", env_vars=dict(MITE="BOOM"))
-    match_help(cli, expected_pattern="mite TEXT [env var: MITE] [default: None] [required]")
+    match_help(cli, expected_pattern=r"mite TEXT \[env var: MITE\] \[default: None\] \[required\]")
 
 
 def test_build_command__argument__envvar__multiple():
@@ -386,7 +439,7 @@ def test_build_command__argument__envvar__multiple():
     match_output(cli, expected_pattern="Error.*Missing argument 'MITE'", exit_code=2)
     check_output(cli, expected_substring="mite='BOOM'", env_vars=dict(MITE="BOOM"))
     check_output(cli, expected_substring="mite='BOOM'", env_vars=dict(NITRO="BOOM"))
-    match_help(cli, expected_pattern="mite TEXT [env var: MITE, NITRO] [default: None] [required]")
+    match_help(cli, expected_pattern=r"mite TEXT \[env var: MITE, NITRO\] \[default: None\] \[required\]")
 
 
 def test_build_command__argument__showenvvar():
@@ -402,7 +455,90 @@ def test_build_command__argument__showenvvar():
     )
 
     check_output(cli, expected_substring="mite='BOOM'", env_vars=dict(MITE="BOOM"))
-    match_help(cli, expected_pattern="mite TEXT(?! [env var: MITE]) [default: None] [required]")
+    match_help(cli, expected_pattern=r"mite TEXT(?! \[env var: MITE\]) \[default: None\] \[required\]")
+
+
+def test_build_command__decorator__simple():
+    cli = typer.Typer()
+
+    def dynamic(dyna: str):
+        print(f"{dyna=}")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=str),
+        decorators=[DecDef(simple_decorator)],
+    )
+
+    match_output(cli, "--dyna=ZOOM", expected_pattern=[
+        "Start simple decorator",
+        "dyna='ZOOM'",
+        "End simple decorator",
+    ])
+
+
+def test_build_command__decorator__complex():
+    cli = typer.Typer()
+
+    def dynamic(dyna: str):
+        print(f"{dyna=}")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=str),
+        decorators=[DecDef(complex_decorator, dec_args=["jawa"], dec_kwargs=dict(k="ewok"), is_simple=False)],
+    )
+
+    match_output(cli, "--dyna=ZOOM", expected_pattern=[
+        "Complex decorator args: a='jawa', k='ewok'",
+        r"Complex decorator before function call: args=\(\), kwargs={'dyna': 'ZOOM'}",
+        "dyna='ZOOM'",
+        "Complex decorator after function call: result=None",
+    ])
+
+
+def test_build_command__decorator__multiple():
+    cli = typer.Typer()
+
+    def dynamic(dyna: str):
+        print(f"{dyna=}")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=str),
+        decorators=[
+            DecDef(simple_decorator),
+            DecDef(complex_decorator, dec_args=["jawa"], dec_kwargs=dict(k="ewok"), is_simple=False),
+        ],
+    )
+
+    match_output(cli, "--dyna=ZOOM", expected_pattern=[
+        "Start simple decorator",
+        "Complex decorator args: a='jawa', k='ewok'",
+        r"Complex decorator before function call: args=\(\), kwargs={'dyna': 'ZOOM'}",
+        "dyna='ZOOM'",
+        "Complex decorator after function call: result=None",
+        "End simple decorator",
+    ])
+
+
+def test_build_command__decorator__raises_exception_if_args_set_for_simple_decorator():
+    cli = typer.Typer()
+
+    def dynamic(dyna: str):
+        print(f"{dyna=}")
+
+    with pytest.raises(BuildCommandError, match="Decorator arguments are not allowed for simple decorators"):
+        build_command(
+            cli,
+            dynamic,
+            decorators=[
+                DecDef(simple_decorator, dec_args=["jawa"], dec_kwargs=dict(k="ewok")),
+            ],
+        )
 
 
 def test_build_command__raises_error_on_unsupported_param_def():

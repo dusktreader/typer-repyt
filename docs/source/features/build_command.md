@@ -20,15 +20,11 @@ Here's an example of how to use the `build_command` feature:
 --8<-- "examples/build_command/dynamic.py"
 ```
 
-Try running this example with the `--help` flag:
-
-```bash
-python examples/build_command__complete.py --help
-```
-
-You will see that the help text shows that the command is fully constructed dynamically!
+Try running this example with the `--help` flag to see that the command is dynamically constructed :
 
 ```
+$ python examples/build_command/dynamic.py --help
+
  Usage: dynamic.py [OPTIONS] MITE1 [MITE2]
 
  Just prints values of passed params
@@ -53,7 +49,7 @@ The dynamically built function is equivalent to the static definition:
 --8<-- "examples/build_command/static.py"
 ```
 
-### Details
+## Details
 
 Let's take a closer look at how we can use the `build_command()` function.
 
@@ -63,7 +59,7 @@ Let's take a closer look at how we can use the `build_command()` function.
 The function signature looks like this:
 
 ```python {linenums="1"}
---8<-- "src/typer_repyt/build_command.py:56:60"
+--8<-- "src/typer_repyt/build_command.py:87:94"
 ```
 
 The `cli` argument is the Typer app that you want your command added to.
@@ -80,11 +76,18 @@ name of the command that's added to the app just like it would in a static defin
     function. They are completely stripped away and replaced with the parameters you pass in `param_defs`. However, it
     may be useful to supply parameters to your template function that match the local values that typer will provide
     when it runs the command. This will ensure that type checkers won't gripe about the function. Note that the dynamic
-    example above matches the parameters in the template function with the `param_defs` that are dynmically injected.
+    example above matches the parameters in the template function with the `param_defs` that are dynamically injected.
 
 The `param_defs` variadic arguments describe the `Option` and `Argument` parameters that will be injected into the
 constructed command function. Each of the attributes of `ParamDef`, `OptDef`, and `ArgDef` correspond directly to
 parameters that you can use to statically define `Options` and `Arguments` to your command.
+
+The `decorators` keyword argument can be used to provide decorators that should be applied to the command. This option
+uses the `DecDef` class to describe each decorator that will be applied.
+
+Finally, the `include_context` keyword argument instructs the `build_command` function whether a `typer.Context`
+argument should be included as the first positional argument to the constructed command. Note that in order to use a
+context, Typer _requires_ that it be the first positional argument and that it is named "ctx".
 
 
 ### `ParamDef`
@@ -94,7 +97,7 @@ parameters that you can use to statically define `Options` and `Arguments` to yo
 Here is the signature of `ParamDef`:
 
 ```python {linenums="1"}
---8<-- "src/typer_repyt/build_command.py:16:28"
+--8<-- "src/typer_repyt/build_command.py:17:30"
 ```
 
 Let's dig into what each attribute is used for.
@@ -115,7 +118,7 @@ Notice that the first parameter to `static` is
 The help text from both commands is identical:
 
 ```
-python examples/build_command/param_def/name.py static --help
+$ python examples/build_command/param_def/name.py static --help
 
  Usage: name.py static [OPTIONS]
 
@@ -124,7 +127,7 @@ python examples/build_command/param_def/name.py static --help
 │    --help              Show this message and exit.                                          │
 ╰─────────────────────────────────────────────────────────────────────────────────────────────╯
 
-python examples/build_command/param_def/name.py dynamic --help
+$ python examples/build_command/param_def/name.py dynamic --help
 
  Usage: name.py dynamic [OPTIONS]
 
@@ -159,7 +162,7 @@ as `int | None` to indicate that the parameter value will either be an integer o
 !!!abstract "Further reading"
 
     - [Typer: CLI Parameter Types](https://typer.tiangolo.com/tutorial/parameter-types/){target="_blank"}
-
+not
 #### `default`
 
 This describes the default value that will be assigned to the parameter. The `default` parmeter may be any Typer
@@ -195,7 +198,7 @@ Here is yet another example with equivalent commands:
 Here is what the produced `--help` output looks like:
 
 ```
-python examples/build_command/param_def/help.py dynamic --help
+$ python examples/build_command/param_def/help.py dynamic --help
 
  Usage: help.py dynamic [OPTIONS]
 
@@ -225,7 +228,7 @@ Can you believe it, another example of equivalent commands?
 You can see how the `--dyna` option is now wrapped in a fancy Rich panel in the `--help` output:
 
 ```
-python examples/build_command/param_def/rich_help_panel.py dynamic --help
+$ python examples/build_command/param_def/rich_help_panel.py dynamic --help
 
  Usage: rich_help_panel.py dynamic [OPTIONS]
 
@@ -259,7 +262,7 @@ Let's look at the equivalent commands:
 And, here is the `--help` output it produces:
 
 ```
-python examples/build_command/param_def/show_default.py dynamic --help
+$ python examples/build_command/param_def/show_default.py dynamic --help
 
  Usage: show_default.py dynamic [OPTIONS]
 
@@ -286,7 +289,7 @@ parameter.
 Here is the signature of `OptDef`:
 
 ```python {linenums="1"}
---8<-- "src/typer_repyt/build_command.py:31:42"
+--8<-- "src/typer_repyt/build_command.py:33:45"
 ```
 
 Let's explore how each of these attributes work.
@@ -307,7 +310,7 @@ Here are the equivalent commands:
 When we run the command, we are prompted to provide the values:
 
 ```
-python examples/build_command/opt_def/prompt.py dynamic
+$ python examples/build_command/opt_def/prompt.py dynamic
 Dyna1: BOOM
 Dyna2 goes [POW]:
 dyna1='BOOM', dyna2='POW'
@@ -337,13 +340,13 @@ Again, we have equivalent implementations:
 Running the example produces input like this:
 
 ```
-python examples/build_command/opt_def/confirmation_prompt.py dynamic
+$ python examples/build_command/opt_def/confirmation_prompt.py dynamic
 Dyna: BOOM
 Repeat for confirmation: BOOM
 dyna='BOOM'
 
 
-python examples/build_command/opt_def/confirmation_prompt.py dynamic
+$ python examples/build_command/opt_def/confirmation_prompt.py dynamic
 Dyna: BOOM
 Repeat for confirmation: POW
 Error: The two entered values do not match.
@@ -370,7 +373,7 @@ Here are our equivalent implementations:
 When we run the example, the input provided to the prompt is completely invisible:
 
 ```
-python examples/build_command/opt_def/hide_input.py dynamic
+$ python examples/build_command/opt_def/hide_input.py dynamic
 Dyna:
 Repeat for confirmation:
 dyna='BOOM'
@@ -395,11 +398,11 @@ Consider these equivalent commands:
 
 Here is the help that this produces:
 
-python examples/build_command/opt_def/override_name.py dynamic --help
+```
+$ python examples/build_command/opt_def/override_name.py dynamic --help
 
  Usage: override_name.py dynamic [OPTIONS]
 
-```
 ╭─ Options ────────────────────────────────────────────────────────────────────────────────────╮
 │ *  --class        TEXT  [default: None] [required]                                           │
 │    --help               Show this message and exit.                                          │
@@ -431,7 +434,7 @@ Here we have the equivalent commands:
 And this produces some friendly help including the option's short form:
 
 ```
-python examples/build_command/opt_def/short_name.py dynamic --help
+$ python examples/build_command/opt_def/short_name.py dynamic --help
 
  Usage: short_name.py dynamic [OPTIONS]
 
@@ -468,7 +471,7 @@ Let's look at an example:
 Now, let's see what happens when we run this command:
 
 ```
-python examples/build_command/opt_def/callback.py dynamic --dyna=BOOM
+$ python examples/build_command/opt_def/callback.py dynamic --dyna=BOOM
 Callback operating on dyna='BOOM'
 dyna='BOOMBOOMBOOM'
 ```
@@ -498,7 +501,7 @@ Here is the equivalent example for `is_eager`:
 And, running the command produces this:
 
 ```
-python examples/build_command/opt_def/is_eager.py dynamic --dyna1=BOOM --dyna2=POW
+$ python examples/build_command/opt_def/is_eager.py dynamic --dyna1=BOOM --dyna2=POW
 Callback 2 operating on val='POW'
 Callback 1 operating on val='BOOM'
 dyna1='one: BOOM', dyna2='two: POW'
@@ -519,7 +522,7 @@ to a Typer `Argument` parameter.
 Here is the signature of `ArgDef`:
 
 ```python {linenums="1"}
---8<-- "src/typer_repyt/build_command.py:45:53"
+--8<-- "src/typer_repyt/build_command.py:48:57"
 ```
 
 Here are what each of the attributes do.
@@ -539,7 +542,7 @@ Have a look at the equivalent implementations in this example:
 To see where the `metavar` comes in, check out the `--help` output:
 
 ```
-python examples/build_command/arg_def/metavar.py dynamic --help
+$ python examples/build_command/arg_def/metavar.py dynamic --help
 
  Usage: metavar.py dynamic [OPTIONS] NITRO
 
@@ -572,7 +575,7 @@ Observe the example:
 Here you can see how the `Argument` does not have a dedicated help section:
 
 ```
-python examples/build_command/arg_def/hidden.py dynamic --help
+$ python examples/build_command/arg_def/hidden.py dynamic --help
 
  Usage: hidden.py dynamic [OPTIONS] MITE
 
@@ -605,7 +608,7 @@ Let's see it in action in an example:
 First, let's have a look at what the `--help` text looks like for this command:
 
 ```
-python examples/build_command/arg_def/envvar.py dynamic --help
+$ python examples/build_command/arg_def/envvar.py dynamic --help
 
  Usage: envvar.py dynamic [OPTIONS] MITE1 MITE2
 
@@ -649,7 +652,7 @@ Here we have our equivalent implementations:
 This results in the environment variables not being shown in the `--help` text:
 
 ```
-┗━━► uv run examples/build_command/arg_def/show_envvar.py dynamic --help
+$ python examples/build_command/arg_def/show_envvar.py dynamic --help
 
  Usage: show_envvar.py dynamic [OPTIONS] MITE
 
@@ -664,3 +667,131 @@ This results in the environment variables not being shown in the `--help` text:
 !!!abstract "Further reading"
 
     - [Typer: CLI Arguments with Environment Variables -- Hide an env var from the help text](https://typer.tiangolo.com/tutorial/arguments/envvar/#multiple-environment-variables){target="_blank"}
+
+
+### `DecDef`
+
+The `DecDef` class is used to define a decorator that should be added to the final built command. This allows you to
+use any of the available decorators that need to be applied to the dynamically constructed function but were not applied
+to the original "template" funciton.
+
+Here is the signature of `ArgDef`:
+
+```python {linenums="1"}
+--8<-- "src/typer_repyt/build_command.py:60:83"
+```
+
+!!!note "About `decorate()`"
+
+    The `decorate()` function is used by the `build_command()` function to apply the decorator. It wasn't _intentded_ to
+    be used directly, but it may work for other purposes. No gurantees are provided!
+
+Here are what each of the attributes do.
+
+
+#### `dec_func`
+
+This is the decorator function that should be applied to the dynamically constructed command.
+
+Have a look at the equivalent implementations in this example:
+
+```python {linenums="1"}
+--8<-- "examples/build_command/dec_def/dec_func.py"
+```
+
+
+Let's run both the static and dynamic command from the example and see that the decorator is applied as expected:
+
+```
+$ python examples/build_command/dec_def/dec_func.py static
+Start simple decorator
+In command
+End simple decorator
+
+$ python examples/build_command/dec_def/dec_func.py dynamic
+Start simple decorator
+In command
+End simple decorator
+```
+
+
+#### `dec_args`
+
+The `dec_args` keyword argument provides a list of positional arguments that should be provided to the decorator.
+
+!!!warning "Complex decorators only!"
+
+    The `dec_args` keyword argument can _only_ be used with a "complex" decorator.
+
+    A "simple" decorator is provided without parentheses or any arguments.
+
+    A "complex" decorator is provided with parentheses and may recieve positional and keyword arguments.
+
+Here are two equivalent implementations with positional arguments:
+
+```python {linenums="1"}
+--8<-- "examples/build_command/dec_def/dec_args.py"
+```
+
+
+Let's check to make sure that the static and dynamic commands produce the same output:
+
+```
+$ python examples/build_command/dec_def/dec_args.py static
+Complex decorator args: a='jawa', b=13
+Complex decorator before function call
+In command
+Complex decorator after function call
+
+$ uv run python examples/build_command/dec_def/dec_args.py dynamic
+Complex decorator args: a='jawa', b=13
+Complex decorator before function call
+In command
+Complex decorator after function call
+```
+
+
+#### `dec_kwargs`
+
+The `dec_kwargs` keyword argument provides a dictionary of keyword arguments that should be provided to the decorator.
+
+!!!warning "Complex decorators only!"
+
+    The `dec_kwargs` keyword argument can _only_ be used with a "complex" decorator.
+
+Once again, we have equivalent implemntations in an example:
+
+```python {linenums="1"}
+--8<-- "examples/build_command/dec_def/dec_kwargs.py"
+```
+
+
+Let's check to make sure that the static and dynamic commands produce the same output:
+
+```
+$ python examples/build_command/dec_def/dec_kwargs.py static
+Complex decorator kewyord args: a='ewok', b=21
+Complex decorator before function call
+In command
+Complex decorator after function call
+
+$ python examples/build_command/dec_def/dec_kwargs.py dynamic
+Complex decorator kewyord args: a='ewok', b=21
+Complex decorator before function call
+In command
+Complex decorator after function call
+```
+
+
+#### `is_simple`
+
+The `is_simple` keyword argument is a flag that indicates whether the provided decorator is "simple" or "complex".
+Basically, if the decorator is used without parentheses it is a "simple" decorator. If the decorator must include
+parentheses and possibly takes positional and keyword arguments, then it is "complex".
+
+!!!note "Not official"
+
+    The adjectives "simple" and "complex" are not used in official Python documentation. However, it's useful in the
+    context of the `typer-repyt` package to clearly explain the difference.
+
+See previous examples to see how `is_simple` can be applied for decorators.

@@ -16,7 +16,6 @@ from typer_repyt.settings.manager import SettingsManager
 
 
 class TestAttachSettings:
-
     def test_attach_settings__adds_settings_to_context(self, runner: CliRunner):
         cli = typer.Typer()
 
@@ -224,7 +223,6 @@ class TestAttachSettings:
 
 
 class TestGetSettings:
-
     def test_get_settings__extracts_settings_from_context(self, runner: CliRunner):
         cli = typer.Typer()
 
@@ -280,7 +278,6 @@ class TestGetSettings:
 
 
 class TestGetManager:
-
     def test_get_manager__extracts_settings_manager_from_context(self, fake_settings_path: Path):
         cli = typer.Typer()
 

@@ -5,8 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## v0.4.1 - 2025-04-23
+- Some small enhancements to the demo
+
+
 ## v0.4.0 - 2025-04-23
 - Improved the `get_settings()` function to take a type hint to avoid casting
+
 
 ## v0.3.0 - 2025-04-23
 - Completed `settings` functionality including:

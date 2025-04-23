@@ -20,5 +20,3 @@ def fake_settings_path(tmp_path: Path) -> Generator[Path, None, None]:
 
     with tweak_env(HOME=str(tmp_path)):
         yield settings_path
-
-

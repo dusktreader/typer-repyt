@@ -11,7 +11,6 @@ from tests.settings.models import DefaultSettingsModel, RequiredFieldsModel
 
 
 class TestBind:
-
     def test_bind__updates_settings_with_cli_args(self, fake_settings_path: Path):
         cli = typer.Typer()
 
@@ -76,12 +75,12 @@ class TestBind:
             prog_name="test",
         )
 
-class TestUpdate:
 
+class TestUpdate:
     def test_update__updates_settings_with_cli_args(self, fake_settings_path: Path):
         cli = typer.Typer()
 
-        add_update(cli,DefaultSettingsModel)
+        add_update(cli, DefaultSettingsModel)
 
         expected_pattern = [
             "name.*hutt",
@@ -109,7 +108,7 @@ class TestUpdate:
     def test_update__does_not_fail_with_invalid_settings(self, fake_settings_path: Path):
         cli = typer.Typer()
 
-        add_update(cli,RequiredFieldsModel)
+        add_update(cli, RequiredFieldsModel)
 
         expected_pattern = [
             "name.*hutt",
@@ -144,8 +143,8 @@ class TestUpdate:
             prog_name="test",
         )
 
-class TestUnset:
 
+class TestUnset:
     def test_unset__unsets_fields_with_cli_args(self, fake_settings_path: Path):
         fake_settings_path.write_text(
             json.dumps(
@@ -199,7 +198,7 @@ class TestUnset:
 
         cli = typer.Typer()
 
-        add_unset(cli,RequiredFieldsModel)
+        add_unset(cli, RequiredFieldsModel)
 
         expected_pattern = [
             "is-humanoid.*True",
@@ -237,11 +236,10 @@ class TestUnset:
 
 
 class TestShow:
-
     def test_show__shows_settings(self):
         cli = typer.Typer()
 
-        add_show(cli,DefaultSettingsModel)
+        add_show(cli, DefaultSettingsModel)
 
         expected_pattern = [
             "name.*jawa",
@@ -275,7 +273,6 @@ class TestShow:
 
 
 class TestReset:
-
     def test_reset__resets_all_fields_to_defaults(self, fake_settings_path: Path):
         fake_settings_path.write_text(
             json.dumps(
@@ -333,9 +330,7 @@ class TestReset:
 
 
 class TestSubcommand:
-
     def test_add_settings_subcommand(self):
-
         cli = typer.Typer()
 
         add_settings_subcommand(cli, RequiredFieldsModel)

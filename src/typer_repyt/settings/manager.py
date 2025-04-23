@@ -5,7 +5,13 @@ from typing import Any, cast
 from inflection import dasherize
 from pydantic import BaseModel, ValidationError
 
-from typer_repyt.exceptions import ConfigInitError, ConfigResetError, ConfigSaveError, ConfigUnsetError, ConfigUpdateError
+from typer_repyt.exceptions import (
+    ConfigInitError,
+    ConfigResetError,
+    ConfigSaveError,
+    ConfigUnsetError,
+    ConfigUpdateError,
+)
 
 
 def get_settings_path(app_name: str) -> Path:
@@ -13,7 +19,6 @@ def get_settings_path(app_name: str) -> Path:
 
 
 class SettingsManager:
-
     def __init__(self, app_name: str, settings_model: type[BaseModel]):
         self.app_name: str = app_name
         self.settings_model: type[BaseModel] = settings_model

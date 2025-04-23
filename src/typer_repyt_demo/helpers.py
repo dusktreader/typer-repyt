@@ -37,7 +37,13 @@ class Captured:
     exit_code: int | str | None = None
     settings: str | None = None
 
+
 BlankLine = Rule(characters=" ")
+
+
+def pseudo_clear(console: Console):
+    for _ in range(console.size.height):
+        console.print(BlankLine)
 
 
 def get_demo_functions(module_name: str) -> list[Callable[..., None]]:
@@ -47,7 +53,6 @@ def get_demo_functions(module_name: str) -> list[Callable[..., None]]:
         if inspect.isfunction(obj) and obj.__name__.startswith("demo"):
             demo_functions.append(obj)
     return sorted(demo_functions, key=lambda f: f.__name__)
-
 
 
 def decompose(func: Callable[..., Any]) -> Decomposed:
@@ -75,13 +80,11 @@ def decompose(func: Callable[..., Any]) -> Decomposed:
                 break
     if code_start_index == 0:
         raise RuntimeError("Failed to strip function declaration and docstring!")
-    source_lines = [re.sub(r'\s+# pyright.*', '', sl) for sl in source_lines]
-    source_lines = [re.sub(r'\s+# type.*', '', sl) for sl in source_lines]
-    source = textwrap.dedent("".join(source_lines[code_start_index+1:]))
+    source_lines = [re.sub(r"\s+# pyright.*", "", sl) for sl in source_lines]
+    source_lines = [re.sub(r"\s+# type.*", "", sl) for sl in source_lines]
+    source = textwrap.dedent("".join(source_lines[code_start_index + 1 :]))
 
     return Decomposed(module=module, name=name, docstring=docstring, source=source)
-
-
 
 
 def capture(demo: Callable[..., None]) -> Captured:
@@ -130,7 +133,7 @@ def capture(demo: Callable[..., None]) -> Captured:
 
 
 def run_demo(demo: Callable[..., None], console: Console, override_label: str | None = None) -> bool:
-    console.clear()
+    pseudo_clear(console)
 
     decomposed = decompose(demo)
     cap: Captured = capture(demo)
@@ -141,11 +144,13 @@ def run_demo(demo: Callable[..., None], console: Console, override_label: str | 
         BlankLine,
         Panel(
             Markdown(
-                "\n".join([
-                    "```python",
-                    decomposed.source,
-                    "```",
-                ])
+                "\n".join(
+                    [
+                        "```python",
+                        decomposed.source,
+                        "```",
+                    ]
+                )
             ),
             title=f"Here is the source code for [yellow]{decomposed.name}()[/yellow]",
             title_align="left",
@@ -156,98 +161,92 @@ def run_demo(demo: Callable[..., None], console: Console, override_label: str | 
     ]
 
     if cap.stdout:
-        parts.extend([
-            BlankLine,
-            BlankLine,
-            Panel(
-                Markdown(
-                    snick.conjoin(
-                        "```text",
-                        cap.stdout,
-                        "```"
+        parts.extend(
+            [
+                BlankLine,
+                BlankLine,
+                Panel(
+                    Markdown(
+                        snick.conjoin("```text", cap.stdout, "```"),
                     ),
+                    title=f"Here is the stdout captured from [yellow]{decomposed.name}()[/yellow]",
+                    title_align="left",
+                    padding=1,
+                    expand=False,
+                    box=box.SIMPLE,
                 ),
-                title=f"Here is the stdout captured from [yellow]{decomposed.name}()[/yellow]",
-                title_align="left",
-                padding=1,
-                expand=False,
-                box=box.SIMPLE,
-            ),
-        ])
+            ]
+        )
 
     if cap.stderr:
-        parts.extend([
-            BlankLine,
-            BlankLine,
-            Panel(
-                Markdown(
-                    snick.conjoin(
-                        "```text",
-                        cap.stderr,
-                        "```"
+        parts.extend(
+            [
+                BlankLine,
+                BlankLine,
+                Panel(
+                    Markdown(
+                        snick.conjoin("```text", cap.stderr, "```"),
                     ),
+                    title=f"Here is the stderr captured from [yellow]{decomposed.name}()[/yellow]",
+                    title_align="left",
+                    padding=1,
+                    expand=False,
+                    box=box.SIMPLE,
                 ),
-                title=f"Here is the stderr captured from [yellow]{decomposed.name}()[/yellow]",
-                title_align="left",
-                padding=1,
-                expand=False,
-                box=box.SIMPLE,
-            ),
-        ])
+            ]
+        )
 
     if cap.error:
-        parts.extend([
-            BlankLine,
-            BlankLine,
-            Panel(
-                f"[red]{cap.error.__class__.__name__}[/red]: [yellow]{str(cap.error)}[/yellow]",
-                title=f"Here is the uncaught exception from [yellow]{decomposed.name}()[/yellow]",
-                title_align="left",
-                padding=1,
-                expand=False,
-                box=box.SIMPLE,
-            )
-        ])
+        parts.extend(
+            [
+                BlankLine,
+                BlankLine,
+                Panel(
+                    f"[red]{cap.error.__class__.__name__}[/red]: [yellow]{str(cap.error)}[/yellow]",
+                    title=f"Here is the uncaught exception from [yellow]{decomposed.name}()[/yellow]",
+                    title_align="left",
+                    padding=1,
+                    expand=False,
+                    box=box.SIMPLE,
+                ),
+            ]
+        )
 
     if cap.exit_code is not None:
-        parts.extend([
-            BlankLine,
-            BlankLine,
-            Panel(
-                Markdown(
-                    snick.conjoin(
-                        "```text",
-                        str(cap.exit_code),
-                        "```"
+        parts.extend(
+            [
+                BlankLine,
+                BlankLine,
+                Panel(
+                    Markdown(
+                        snick.conjoin("```text", str(cap.exit_code), "```"),
                     ),
+                    title=f"Here is the exit code from [yellow]{decomposed.name}()[/yellow]",
+                    title_align="left",
+                    padding=1,
+                    expand=False,
+                    box=box.SIMPLE,
                 ),
-                title=f"Here is the exit code from [yellow]{decomposed.name}()[/yellow]",
-                title_align="left",
-                padding=1,
-                expand=False,
-                box=box.SIMPLE,
-            )
-        ])
+            ]
+        )
 
     if cap.settings is not None:
-        parts.extend([
-            BlankLine,
-            BlankLine,
-            Panel(
-                Markdown(
-                    snick.conjoin(
-                        "```json",
-                        cap.settings,
-                        "```"
+        parts.extend(
+            [
+                BlankLine,
+                BlankLine,
+                Panel(
+                    Markdown(
+                        snick.conjoin("```json", cap.settings, "```"),
                     ),
+                    title=f"Here are the final contents of the settings file from [yellow]{decomposed.name}()[/yellow]",
+                    title_align="left",
+                    padding=1,
+                    expand=False,
+                    box=box.SIMPLE,
                 ),
-                title=f"Here are the final contents of the settings file from [yellow]{decomposed.name}()[/yellow]",
-                title_align="left",
-                padding=1,
-                expand=False,
-                box=box.SIMPLE,
-            )
-        ])
+            ]
+        )
 
     label = override_label if override_label else f"{decomposed.module}()"
     console.print(
@@ -256,7 +255,7 @@ def run_demo(demo: Callable[..., None], console: Console, override_label: str | 
             padding=1,
             title=f"Showing [yellow]{decomposed.name}()[/yellow] for [green]{label}[/green]",
             title_align="left",
-            subtitle="[blue]https://github.com/dusktreader/py-buzz[/blue]",
+            subtitle="[blue]https://github.com/dusktreader/typer_repyt[/blue]",
             subtitle_align="left",
         ),
     )

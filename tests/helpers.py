@@ -100,18 +100,12 @@ def match_output(
         if negative_pattern:
             did_match = not did_match
         assert did_match, build_pattern_fail_message(
-            ep,
-            mangled_pattern,
-            output,
-            mangled_output,
-            negative_pattern=negative_pattern
+            ep, mangled_pattern, output, mangled_output, negative_pattern=negative_pattern
         )
 
     if enforce_order:
         assert all(left <= right for (left, right) in pairwise(start_positions)), build_order_fail_message(
-            expected_pattern,
-            start_positions,
-            output
+            expected_pattern, start_positions, output
         )
 
 
@@ -182,6 +176,7 @@ def build_exception_pattern_message(
         """
     )
 
+
 def build_pattern_fail_message(
     pattern: str,
     mangled_pattern: str,
@@ -207,6 +202,7 @@ def build_pattern_fail_message(
         {repr(mangled_output)}
         """
     )
+
 
 def build_order_fail_message(expected_patterns: list[str], start_positions: list[int], output: str) -> str:
     return conjoin(

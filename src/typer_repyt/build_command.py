@@ -142,7 +142,7 @@ def build_command(
         ArgDef(name="mite2", param_type=int | None, help="This is mighty argument 2", default=None),
         decorators=[
             DecDef(simple_decorator),
-            DecDef(complex_decorator, dec_args=["nitro"], dec_kwargs=dict(glycerine=True),
+            DecDef(complex_decorator, dec_args=["nitro"], dec_kwargs=dict(glycerine=True)),
         ],
         include_context="t_ctx",
     )

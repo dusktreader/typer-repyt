@@ -11,7 +11,7 @@ def complex_decorator(a: str = "jawa", b: int = 13) -> Callable[..., Any]:
     def _decorate(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
-            print(f"Complex decorator kewyord args: {a=}, {b=}")
+            print(f"Complex decorator keyword args: {a=}, {b=}")
             print("Complex decorator before function call")
             result = func(*args, **kwargs)
             print("Complex decorator after function call")

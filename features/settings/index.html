@@ -1058,25 +1058,25 @@ function to dynamically create a command and then adds it to the <code>cli</code
 <p>This method adds the <code>update</code> subcommand to the provided CLI app. It uses the <a href="../build_command/"><code>build_command()</code></a>
 function to dynamically create a command and then adds it to the <code>cli</code> argument.</p>
 <p>Function signature:</p>
-<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-10-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">add_update</span><span class="p">(</span><span class="n">cli</span><span class="p">:</span> <span class="n">typer</span><span class="o">.</span><span class="n">Typer</span><span class="p">,</span> <span class="n">settings_model</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">]):</span>
+<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-10-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a>
 </span></code></pre></div></td></tr></table></div>
 <h3 id="add_unset"><code>add_unset()</code></h3>
 <p>This method adds the <code>unset</code> subcommand to the provided CLI app. It uses the <a href="../build_command/"><code>build_command()</code></a>
 function to dynamically create a command and then adds it to the <code>cli</code> argument.</p>
 <p>Function signature:</p>
-<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-11-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">unset</span><span class="p">(</span><span class="n">ctx</span><span class="p">:</span> <span class="n">typer</span><span class="o">.</span><span class="n">Context</span><span class="p">):</span>
+<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-11-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a>
 </span></code></pre></div></td></tr></table></div>
 <h3 id="add_show"><code>add_show()</code></h3>
 <p>This method adds the <code>show</code> subcommand to the provided CLI app. It uses the <a href="../build_command/"><code>build_command()</code></a>
 function to dynamically create a command and then adds it to the <code>cli</code> argument.</p>
 <p>Function signature:</p>
-<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-12-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">show</span><span class="p">(</span><span class="n">ctx</span><span class="p">:</span> <span class="n">typer</span><span class="o">.</span><span class="n">Context</span><span class="p">):</span>  <span class="c1"># pyright: ignore[reportUnusedParameter]</span>
+<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-12-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a>
 </span></code></pre></div></td></tr></table></div>
 <h3 id="add_reset"><code>add_reset()</code></h3>
 <p>This method adds the <code>reset</code> subcommand to the provided CLI app. It uses the <a href="../build_command/"><code>build_command()</code></a>
 function to dynamically create a command and then adds it to the <code>cli</code> argument.</p>
 <p>Function signature:</p>
-<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-13-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">add_reset</span><span class="p">(</span><span class="n">cli</span><span class="p">:</span> <span class="n">typer</span><span class="o">.</span><span class="n">Typer</span><span class="p">,</span> <span class="n">settings_model</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">]):</span>
+<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-13-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a>
 </span></code></pre></div></td></tr></table></div>
 <h3 id="add_settings_subcommand"><code>add_settings_subcommand()</code></h3>
 <p>This method does three things:</p>
@@ -1087,7 +1087,7 @@ function to dynamically create a command and then adds it to the <code>cli</code
 </ul>
 <p>The result is that all the subcommands are available under one <code>settings</code> subcommand.</p>
 <p>Function signature:</p>
-<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-14-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">add_settings_subcommand</span><span class="p">(</span><span class="n">cli</span><span class="p">:</span> <span class="n">typer</span><span class="o">.</span><span class="n">Typer</span><span class="p">,</span> <span class="n">settings_model</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">]):</span>
+<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-14-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1"></a>
 </span></code></pre></div></td></tr></table></div>
 
 

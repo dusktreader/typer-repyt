@@ -19,6 +19,7 @@ def get_user_context(ctx: typer.Context):
         ctx.obj = RepytContext()
     return ctx.obj
 
+
 def to_context(ctx: typer.Context, name: str, val: SettingsManager):
     user_context = get_user_context(ctx)
     field_type = RepytContext.__dataclass_fields__[name].type
@@ -28,12 +29,12 @@ def to_context(ctx: typer.Context, name: str, val: SettingsManager):
         require_condition(
             len(defined_types) == 1,
             "PANIC! RepytContext fields must only have one type or None.",
-            raise_exc_class=RuntimeError
+            raise_exc_class=RuntimeError,
         )
         field_type = defined_types[0]
 
     # TODO: Get the type hinting on the next line right.
-    ContextError.ensure_type(val, field_type, "Value is not of type any of the union types") # type: ignore[arg-type]
+    ContextError.ensure_type(val, field_type, "Value is not of type any of the union types")  # type: ignore[arg-type]
 
     setattr(user_context, name, val)
 

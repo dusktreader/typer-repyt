@@ -48,7 +48,6 @@ def fake_settings_path(tmp_path: Path) -> Generator[Path, None, None]:
 
 
 class TestSettingsManager:
-
     def test_init__loads_default_model(self):
         manager = SettingsManager("test", DefaultSettingsModel)
         assert manager.app_name == "test"
@@ -66,12 +65,7 @@ class TestSettingsManager:
         settings_path = fake_settings_path
         settings_path.write_text(
             json.dumps(
-                dict(
-                    name="hutt",
-                    planet="nal hutta",
-                    is_humanoid=False,
-                    alignment="evil"
-                ),
+                dict(name="hutt", planet="nal hutta", is_humanoid=False, alignment="evil"),
             )
         )
 
@@ -87,7 +81,6 @@ class TestSettingsManager:
         assert manager.settings_instance.planet == "nal hutta"
         assert not manager.settings_instance.is_humanoid
         assert manager.settings_instance.alignment == "evil"
-
 
     def test_init__loads_invalid_model_with_warnings(self):
         manager = SettingsManager("test", RequiredFieldsModel)
@@ -278,8 +271,10 @@ class TestSettingsManager:
         manager.update(name="pyke", alignment="negative")
         computed = manager.pretty(with_style=False)
         print(computed)
-        expected = "       " + snick.dedent(
-            """
+        expected = (
+            "       "
+            + snick.dedent(
+                """
                    name -> pyke
             is-humanoid -> True
               alignment -> negative
@@ -288,7 +283,8 @@ class TestSettingsManager:
                  planet -> Field required
               alignment -> Value error, negative is an invalid alignment
             """
-        ).strip()
+            ).strip()
+        )
         print(expected)
         assert expected == computed
 
@@ -297,14 +293,11 @@ class TestSettingsManager:
         manager.save()
 
         assert json.loads(fake_settings_path.read_text()) == dict(
-            name="jawa",
-            planet="tatooine",
-            is_humanoid=True,
-            alignment="neutral"
+            name="jawa", planet="tatooine", is_humanoid=True, alignment="neutral"
         )
 
     def test_save__raises_error_on_failure(self, mocker: MockerFixture):
         manager = SettingsManager("test", DefaultSettingsModel)
-        mocker.patch.object(manager, "settings_path").write_text.side_effect=RuntimeError("BOOM")
+        mocker.patch.object(manager, "settings_path").write_text.side_effect = RuntimeError("BOOM")
         with pytest.raises(ConfigSaveError, match="Failed to save settings"):
             manager.save()

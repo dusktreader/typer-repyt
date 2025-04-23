@@ -19,9 +19,12 @@ class Feature(AutoNameEnum):
 
 
 def start(
-    feature: Annotated[Feature | None, typer.Option(
-        help="The feature to demo. If not provided, demo ALL",
-    )] = None,
+    feature: Annotated[
+        Feature | None,
+        typer.Option(
+            help="The feature to demo. If not provided, demo ALL",
+        ),
+    ] = None,
 ):
     """
     This cli app will demo the features of `typer-repyt`!
@@ -41,7 +44,7 @@ def start(
     override_label_map: dict[Feature, str] = {}
 
     greeting_lines = [
-        "Welcome to the `typer-repyt` demo!",
+        "You are viewing the `typer-repyt` demo!",
         "",
         "This program will show you the different features available in `typer-repyt` and what it's like to use them",
         "",
@@ -60,7 +63,9 @@ def start(
             Markdown(snick.conjoin(*greeting_lines)),
             padding=1,
             title="[green]Welcome to typer-repyt![/green]",
+            title_align="left",
             subtitle="[blue]https://github.com/dusktreader/typer-repyt[/blue]",
+            subtitle_align="left",
         )
     )
     console.print()
@@ -92,7 +97,9 @@ def start(
             ),
             padding=1,
             title="[green]Thanks![/green]",
+            title_align="left",
             subtitle="[blue]https://github.com/dusktreader/typer-repyt[/blue]",
+            subtitle_align="left",
         )
     )
     console.print()

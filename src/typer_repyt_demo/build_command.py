@@ -8,6 +8,7 @@ from typing import Any
 import typer
 from typer_repyt import build_command, OptDef, ArgDef, DecDef
 
+
 def demo_1__build_command__basic():
     """
     This function demonstrates the use of the `build_command()` function.
@@ -17,13 +18,11 @@ def demo_1__build_command__basic():
 
     cli = typer.Typer()
 
-
     def dynamic(dyna1: str, dyna2: int, mite1: str, mite2: int | None):
         """
         Just prints values of passed params
         """
         print(f"{dyna1=}, {dyna2=}, {mite1=}, {mite2=}")
-
 
     build_command(
         cli,
@@ -53,7 +52,6 @@ def demo_2__build_command__with_simple_decorator():
 
     cli = typer.Typer()
 
-
     def simple_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -61,15 +59,14 @@ def demo_2__build_command__with_simple_decorator():
             result = func(*args, **kwargs)
             print(f"Decorator after function call: {result=}")
             return result
-        return wrapper
 
+        return wrapper
 
     def dynamic(dyna: str):
         """
         Just prints values of the passed param
         """
         print(f"{dyna=}")
-
 
     build_command(
         cli,
@@ -100,7 +97,6 @@ def demo_3__build_command__with_chained_decorators():
 
     cli = typer.Typer()
 
-
     def first_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -108,6 +104,7 @@ def demo_3__build_command__with_chained_decorators():
             result = func(*args, **kwargs)
             print("End first decorator")
             return result
+
         return wrapper
 
     def second_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -117,15 +114,14 @@ def demo_3__build_command__with_chained_decorators():
             result = func(*args, **kwargs)
             print("End second decorator")
             return result
-        return wrapper
 
+        return wrapper
 
     def dynamic(dyna: str):
         """
         Just prints values of the passed param
         """
         print(f"{dyna=}")
-
 
     build_command(
         cli,
@@ -153,7 +149,6 @@ def demo_4__build_command__with_complex_decorator():
 
     cli = typer.Typer()
 
-
     def complex_decorator(a: str, k: str = "hutt") -> Callable[..., Any]:
         def _decorate(func: Callable[..., Any]) -> Callable[..., Any]:
             @wraps(func)
@@ -163,16 +158,16 @@ def demo_4__build_command__with_complex_decorator():
                 result = func(*args, **kwargs)
                 print(f"Decorator after function call: {result=}")
                 return result
-            return wrapper
-        return _decorate
 
+            return wrapper
+
+        return _decorate
 
     def dynamic(dyna: str):
         """
         Just prints values of the passed param
         """
         print(f"{dyna=}")
-
 
     build_command(
         cli,

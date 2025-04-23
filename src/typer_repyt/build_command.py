@@ -62,6 +62,7 @@ class DecDef:
     """
     Define a decorator function and it parameters.
     """
+
     dec_func: Callable[..., Any]
     dec_args: list[Any] = field(default_factory=list)
     dec_kwargs: dict[str, Any] = field(default_factory=dict)
@@ -81,7 +82,6 @@ class DecDef:
 
         update_wrapper(wrap, f)
         return wrap
-
 
 
 def build_command(

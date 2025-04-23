@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from typer_repyt.constants import Validation
 from typer_repyt.settings.attach import attach_settings, get_settings
 
+
 def demo_1__attach_settings__basic():
     """
     This function demonstrates the use of the `attach_settings` decorator.
@@ -14,14 +15,13 @@ def demo_1__attach_settings__basic():
     In order to use this decorator, your command must take a `typer.Context`
     object as the first argument.
     """
+
     class ExampleSettings(BaseModel):
         name: str = "jawa"
         planet: str = "tatooine"
         alignment: str = "neutral"
 
-
     cli = typer.Typer()
-
 
     @cli.command()
     @attach_settings(ExampleSettings)
@@ -38,14 +38,13 @@ def demo_2__attach_settings__enforce_validation():
     by default, require the settings to be valid before they can be
     attached to the app's context.
     """
+
     class ExampleSettings(BaseModel):
         name: str
         planet: str = "tatooine"
         alignment: str = "neutral"
 
-
     cli = typer.Typer()
-
 
     @cli.command()
     @attach_settings(ExampleSettings)
@@ -65,14 +64,13 @@ def demo_3__attach_settings__allow_invalid():
     important because your settings may have non-default settings that need
     to be set _through_ a command.
     """
+
     class ExampleSettings(BaseModel):
         name: str
         planet: str = "tatooine"
         alignment: str = "neutral"
 
-
     cli = typer.Typer()
-
 
     @cli.command()
     @attach_settings(ExampleSettings, validation=Validation.NONE)

@@ -18,6 +18,7 @@ def simple_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         result = func(*args, **kwargs)
         print("End simple decorator")
         return result
+
     return wrapper
 
 
@@ -30,7 +31,9 @@ def complex_decorator(a: str, k: str = "hutt") -> Callable[..., Any]:
             result = func(*args, **kwargs)
             print(f"Complex decorator after function call: {result=}")
             return result
+
         return wrapper
+
     return _decorate
 
 
@@ -59,14 +62,19 @@ def test_reference_static_implementation():
     match_output(cli, "etim", expected_pattern="Error.*Missing option '--dyna2'", exit_code=2)
     match_output(cli, "--dyna2=13", expected_pattern="Error.*Missing argument 'MITE1'", exit_code=2)
 
-    match_output(cli, "--dyna2=13", "17", expected_pattern=[
-        "Start simple decorator",
-        "Complex decorator args: a='jawa', k='ewok'",
-        r"Complex decorator before function call: args=\(\), kwargs={'ctx': .*Context.*, 'mite1': '17', 'dyna2': 13, 'dyna1': 'default1', 'mite2': None}",
-        "dyna1='default1', dyna2=13",
-        "Complex decorator after function call: result=None",
-        "End simple decorator",
-    ])
+    match_output(
+        cli,
+        "--dyna2=13",
+        "17",
+        expected_pattern=[
+            "Start simple decorator",
+            "Complex decorator args: a='jawa', k='ewok'",
+            r"Complex decorator before function call: args=\(\), kwargs={'ctx': .*Context.*, 'mite1': '17', 'dyna2': 13, 'dyna1': 'default1', 'mite2': None}",
+            "dyna1='default1', dyna2=13",
+            "Complex decorator after function call: result=None",
+            "End simple decorator",
+        ],
+    )
 
     match_help(
         cli,
@@ -110,14 +118,19 @@ def test_equivalent_dynamic_implementation():
     match_output(cli, "etim", expected_pattern="Error.*Missing option '--dyna2'", exit_code=2)
     match_output(cli, "--dyna2=13", expected_pattern="Error.*Missing argument 'MITE1'", exit_code=2)
 
-    match_output(cli, "--dyna2=13", "17", expected_pattern=[
-        "Start simple decorator",
-        "Complex decorator args: a='jawa', k='ewok'",
-        r"Complex decorator before function call: args=\(\), kwargs={'ctx': .*Context.*, 'dyna2': 13, 'mite1': '17', 'dyna1': 'default1', 'mite2': None}",
-        "dyna1='default1', dyna2=13",
-        "Complex decorator after function call: result=None",
-        "End simple decorator",
-    ])
+    match_output(
+        cli,
+        "--dyna2=13",
+        "17",
+        expected_pattern=[
+            "Start simple decorator",
+            "Complex decorator args: a='jawa', k='ewok'",
+            r"Complex decorator before function call: args=\(\), kwargs={'ctx': .*Context.*, 'dyna2': 13, 'mite1': '17', 'dyna1': 'default1', 'mite2': None}",
+            "dyna1='default1', dyna2=13",
+            "Complex decorator after function call: result=None",
+            "End simple decorator",
+        ],
+    )
 
     match_help(
         cli,
@@ -471,11 +484,15 @@ def test_build_command__decorator__simple():
         decorators=[DecDef(simple_decorator)],
     )
 
-    match_output(cli, "--dyna=ZOOM", expected_pattern=[
-        "Start simple decorator",
-        "dyna='ZOOM'",
-        "End simple decorator",
-    ])
+    match_output(
+        cli,
+        "--dyna=ZOOM",
+        expected_pattern=[
+            "Start simple decorator",
+            "dyna='ZOOM'",
+            "End simple decorator",
+        ],
+    )
 
 
 def test_build_command__decorator__complex():
@@ -491,12 +508,16 @@ def test_build_command__decorator__complex():
         decorators=[DecDef(complex_decorator, dec_args=["jawa"], dec_kwargs=dict(k="ewok"), is_simple=False)],
     )
 
-    match_output(cli, "--dyna=ZOOM", expected_pattern=[
-        "Complex decorator args: a='jawa', k='ewok'",
-        r"Complex decorator before function call: args=\(\), kwargs={'dyna': 'ZOOM'}",
-        "dyna='ZOOM'",
-        "Complex decorator after function call: result=None",
-    ])
+    match_output(
+        cli,
+        "--dyna=ZOOM",
+        expected_pattern=[
+            "Complex decorator args: a='jawa', k='ewok'",
+            r"Complex decorator before function call: args=\(\), kwargs={'dyna': 'ZOOM'}",
+            "dyna='ZOOM'",
+            "Complex decorator after function call: result=None",
+        ],
+    )
 
 
 def test_build_command__decorator__multiple():
@@ -515,14 +536,18 @@ def test_build_command__decorator__multiple():
         ],
     )
 
-    match_output(cli, "--dyna=ZOOM", expected_pattern=[
-        "Start simple decorator",
-        "Complex decorator args: a='jawa', k='ewok'",
-        r"Complex decorator before function call: args=\(\), kwargs={'dyna': 'ZOOM'}",
-        "dyna='ZOOM'",
-        "Complex decorator after function call: result=None",
-        "End simple decorator",
-    ])
+    match_output(
+        cli,
+        "--dyna=ZOOM",
+        expected_pattern=[
+            "Start simple decorator",
+            "Complex decorator args: a='jawa', k='ewok'",
+            r"Complex decorator before function call: args=\(\), kwargs={'dyna': 'ZOOM'}",
+            "dyna='ZOOM'",
+            "Complex decorator after function call: result=None",
+            "End simple decorator",
+        ],
+    )
 
 
 def test_build_command__decorator__raises_exception_if_args_set_for_simple_decorator():

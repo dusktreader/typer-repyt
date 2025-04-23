@@ -16,6 +16,7 @@ class Validation(Flag):
     """
     Defines whether validation should happen "before", "after", "both", or "none"
     """
+
     BEFORE = auto()
     AFTER = auto()
     BOTH = BEFORE | AFTER

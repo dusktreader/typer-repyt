@@ -1,6 +1,7 @@
 """
 This set of demos shows the use of the varioous settings-related commands.
 """
+
 import json
 from pathlib import Path
 
@@ -18,6 +19,7 @@ def demo_1__bind__basic():
     written to disk where they can be retrieved for future commands.
     After the `bind` command is complete, it shows the updated settings.
     """
+
     class ExampleSettings(BaseModel):
         name: str
         planet: str
@@ -36,6 +38,7 @@ def demo_2__bind__invalid_settings():
     a value through the command line. If any of these required values
     are not included, the CLI app will show an error message.
     """
+
     class ExampleSettings(BaseModel):
         name: str
         planet: str
@@ -52,6 +55,7 @@ def demo_3__bind__help():
     This function demonstrates the help text that's provided with
     the `bind` command.
     """
+
     class ExampleSettings(BaseModel):
         name: str
         planet: str
@@ -73,6 +77,7 @@ def demo_4__update():
     After the `update` command is complete, it shows the updated settings
     including any settings values that are still invalid.
     """
+
     class ExampleSettings(BaseModel):
         name: str
         planet: str
@@ -89,6 +94,7 @@ def demo_5__update__help():
     This function demonstrates the help text that's provided with
     the `update` command.
     """
+
     class ExampleSettings(BaseModel):
         name: str
         planet: str
@@ -114,6 +120,7 @@ def demo_6__unset():
         To demonstrate this working, we need to hack the settings file
         before the command is invoked.
     """
+
     class ExampleSettings(BaseModel):
         name: str
         planet: str
@@ -142,6 +149,7 @@ def demo_7__unset__help():
     This function demonstrates the help text that's provided with
     the `unset` command.
     """
+
     class ExampleSettings(BaseModel):
         name: str
         planet: str
@@ -158,6 +166,7 @@ def demo_8__show():
     This function demonstrates the `show` command. It simply shows
     the current settings.
     """
+
     class ExampleSettings(BaseModel):
         name: str
         planet: str
@@ -181,6 +190,7 @@ def demo_9__reset():
         To demonstrate this working, we need to hack the settings file
         before the command is invoked.
     """
+
     class ExampleSettings(BaseModel):
         name: str
         planet: str

@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import cast
 
 import pytest
 import typer
@@ -9,10 +8,11 @@ from typer.testing import CliRunner
 
 from typer_repyt.constants import Validation
 from typer_repyt.exceptions import ConfigError, ContextError
-from typer_repyt.settings.attach import attach_settings, get_settings
+from typer_repyt.settings.attach import attach_settings, get_manager, get_settings
 
 from tests.helpers import match_output
 from tests.settings.models import DefaultSettingsModel, RequiredFieldsModel
+from typer_repyt.settings.manager import SettingsManager
 
 
 class TestAttachSettings:
@@ -23,12 +23,11 @@ class TestAttachSettings:
         @cli.command()
         @attach_settings(DefaultSettingsModel)
         def noop(ctx: typer.Context):  # pyright: ignore[reportUnusedFunction]
-            assert hasattr(ctx.obj, "settings")
-            assert isinstance(ctx.obj.settings, DefaultSettingsModel)
-            assert ctx.obj.settings.name == "jawa"
-            assert ctx.obj.settings.planet == "tatooine"
-            assert ctx.obj.settings.is_humanoid
-            assert ctx.obj.settings.alignment == "neutral"
+            settings = get_settings(ctx, DefaultSettingsModel)
+            assert settings.name == "jawa"
+            assert settings.planet == "tatooine"
+            assert settings.is_humanoid
+            assert settings.alignment == "neutral"
 
         result = runner.invoke(cli, [], prog_name="test")
         assert result.exit_code == 0
@@ -50,12 +49,11 @@ class TestAttachSettings:
         @cli.command()
         @attach_settings(RequiredFieldsModel, validation=Validation.NONE)
         def noop(ctx: typer.Context):  # pyright: ignore[reportUnusedFunction]
-            assert hasattr(ctx.obj, "settings")
-            assert isinstance(ctx.obj.settings, RequiredFieldsModel)
-            assert not hasattr(ctx.obj.settings, "name")
-            assert not hasattr(ctx.obj.settings, "planet")
-            assert ctx.obj.settings.is_humanoid
-            assert ctx.obj.settings.alignment == "neutral"
+            settings = get_settings(ctx, RequiredFieldsModel)
+            assert not hasattr(settings, "name")
+            assert not hasattr(settings, "planet")
+            assert settings.is_humanoid
+            assert settings.alignment == "neutral"
 
         result = runner.invoke(cli, [], prog_name="test")
         assert result.exit_code == 0
@@ -119,7 +117,7 @@ class TestAttachSettings:
         @attach_settings(model, validation=Validation.BOTH)
         def noop(ctx: typer.Context):  # pyright: ignore[reportUnusedFunction]
             print("in function body")
-            settings = get_settings(ctx)
+            settings = get_settings(ctx, model)
             setattr(settings, "alignment", "invalid-alignment")
 
         match_output(
@@ -136,7 +134,7 @@ class TestAttachSettings:
         @cli.command()
         @attach_settings(DefaultSettingsModel, persist=True)
         def noop(ctx: typer.Context):  # pyright: ignore[reportUnusedFunction]
-            settings = cast(DefaultSettingsModel, get_settings(ctx))
+            settings = get_settings(ctx, DefaultSettingsModel)
             settings.name = "hutt"
             settings.planet = "nal hutta"
             settings.is_humanoid = False
@@ -174,12 +172,11 @@ class TestAttachSettings:
         @cli.command()
         @attach_settings(RequiredFieldsModel)
         def noop(ctx: typer.Context):  # pyright: ignore[reportUnusedFunction]
-            assert hasattr(ctx.obj, "settings")
-            assert isinstance(ctx.obj.settings, RequiredFieldsModel)
-            assert ctx.obj.settings.name == "jawa"
-            assert ctx.obj.settings.planet == "tatooine"
-            assert ctx.obj.settings.is_humanoid
-            assert ctx.obj.settings.alignment == "neutral"
+            settings = get_settings(ctx, RequiredFieldsModel)
+            assert settings.name == "jawa"
+            assert settings.planet == "tatooine"
+            assert settings.is_humanoid
+            assert settings.alignment == "neutral"
 
         result = runner.invoke(cli, [], prog_name="test")
         assert result.exit_code == 0
@@ -234,7 +231,7 @@ class TestGetSettings:
         @cli.command()
         @attach_settings(DefaultSettingsModel)
         def noop(ctx: typer.Context):  # pyright: ignore[reportUnusedFunction]
-            settings = get_settings(ctx)
+            settings = get_settings(ctx, DefaultSettingsModel)
             assert isinstance(settings, DefaultSettingsModel)
             assert settings.name == "jawa"
             assert settings.planet == "tatooine"
@@ -244,22 +241,82 @@ class TestGetSettings:
         result = runner.invoke(cli, [], prog_name="test")
         assert result.exit_code == 0
 
-    def test_get_settings__raises_error_with_no_attached_settings(self, runner: CliRunner):
+    def test_get_settings__raises_error_with_no_attached_settings(self):
         cli = typer.Typer()
 
         @cli.command()
         def noop(ctx: typer.Context):  # pyright: ignore[reportUnusedFunction]
-            """
-            Note that we can't use `pytest.raises` here, because if the error doesn't match, pytest will raise an
-            exception that won't be caught, and the cli will just exit with a non-zero code.
-            """
-            try:
-                get_settings(ctx)
-            except ContextError as err:
-                assert "settings is not bound to context" in err.message
-            except Exception as err:
-                pytest.fail(f"Unexpected error: {err}")
-            else:
-                pytest.fail("The test should have failed!")
+            get_settings(ctx, DefaultSettingsModel)
 
-        runner.invoke(cli, [], prog_name="test")
+        match_output(
+            cli,
+            exception_type=ContextError,
+            exception_pattern="not bound to context",
+            exit_code=1,
+            prog_name="test",
+        )
+
+    def test_get_settings__raises_error_with_wrong_settings_type(self):
+        class NoMatchSettings(BaseModel):
+            name: str = "jawa"
+            planet: str = "tatooine"
+            is_humanoid: bool = True
+            alignment: str = "neutral"
+
+        cli = typer.Typer()
+
+        @cli.command()
+        @attach_settings(DefaultSettingsModel)
+        def noop(ctx: typer.Context):  # pyright: ignore[reportUnusedFunction]
+            get_settings(ctx, NoMatchSettings)
+
+        match_output(
+            cli,
+            exception_type=ConfigError,
+            exception_pattern="instance doesn't match expected",
+            exit_code=1,
+            prog_name="test",
+        )
+
+
+class TestGetManager:
+
+    def test_get_manager__extracts_settings_manager_from_context(self, fake_settings_path: Path):
+        cli = typer.Typer()
+
+        @cli.command()
+        @attach_settings(DefaultSettingsModel)
+        def noop(ctx: typer.Context):  # pyright: ignore[reportUnusedFunction]
+            manager = get_manager(ctx)
+            assert isinstance(manager, SettingsManager)
+            assert manager.app_name == "test"
+            assert manager.settings_model == DefaultSettingsModel
+            assert manager.settings_path == fake_settings_path
+            assert manager.invalid_warnings == {}
+            assert isinstance(manager.settings_instance, DefaultSettingsModel)
+            print("Passed!")
+
+        match_output(
+            cli,
+            expected_pattern=["Passed"],
+            exit_code=0,
+            prog_name="test",
+        )
+
+    def test_get_manager__raises_exception_if_non_manager_retrieved(self):
+        cli = typer.Typer()
+
+        @cli.command()
+        @attach_settings(DefaultSettingsModel)
+        def noop(ctx: typer.Context):  # pyright: ignore[reportUnusedFunction]
+            ctx.obj.settings_manager = "Not a manager!"
+            get_manager(ctx)
+            print("Passed!")
+
+        match_output(
+            cli,
+            exception_type=ConfigError,
+            exception_pattern="Non-manager found in user context",
+            exit_code=1,
+            prog_name="test",
+        )

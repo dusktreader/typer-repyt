@@ -4,7 +4,6 @@ from types import NoneType, UnionType
 
 from buzz import require_condition
 import typer
-from pydantic import BaseModel
 
 from typer_repyt.exceptions import ContextError
 from typer_repyt.settings.manager import SettingsManager
@@ -12,7 +11,6 @@ from typer_repyt.settings.manager import SettingsManager
 
 @dataclass
 class RepytContext:
-    settings: BaseModel | None = None
     settings_manager: SettingsManager | None = None
 
 
@@ -21,7 +19,7 @@ def get_user_context(ctx: typer.Context):
         ctx.obj = RepytContext()
     return ctx.obj
 
-def to_context(ctx: typer.Context, name: str, val: BaseModel | SettingsManager):
+def to_context(ctx: typer.Context, name: str, val: SettingsManager):
     user_context = get_user_context(ctx)
     field_type = RepytContext.__dataclass_fields__[name].type
 
@@ -40,7 +38,7 @@ def to_context(ctx: typer.Context, name: str, val: BaseModel | SettingsManager):
     setattr(user_context, name, val)
 
 
-def from_context(ctx: typer.Context, name: str) -> BaseModel | SettingsManager:
+def from_context(ctx: typer.Context, name: str) -> SettingsManager:
     user_context = get_user_context(ctx)
     return ContextError.enforce_defined(getattr(user_context, name), f"{name} is not bound to context")
 

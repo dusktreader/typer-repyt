@@ -24,7 +24,7 @@ Let's take a look at how we can use this powerful feature set.
 Let's start by looking at a code example:
 
 ```python {linenums="1"}
---8<-- "examples/settings/complete.py"
+--8<-- "examples/settings/commands.py"
 ```
 
 In this example, the app provides a [Pydantic](https://docs.pydantic.dev/latest/) model that describes all of the
@@ -47,7 +47,7 @@ Great, now let's try a few commands in this app to see how the settings commands
 First, we will just show the config
 
 ```
-$ python examples/settings/complete.py settings show
+$ python examples/settings/commands.py settings show
 
 ╭─ Current settings ──────────────────────────────────────────────────────────────────────────╮
 │                                                                                             │
@@ -74,7 +74,7 @@ Next, let's make the settings valid by setting the missing values with `bind`:
 │   is-humanoid -> True                                                                       │
 │     alignment -> neutral                                                                    │
 │                                                                                             │
-╰─ saved to /home/dusktreader/.local/share/complete.py/settings.json ─────────────────────────╯
+╰─ saved to /home/dusktreader/.local/share/commands.py/settings.json ─────────────────────────╯
 ```
 
 Now, the settings are valid. You can also see that the settings were saved to disk for your app to use in future
@@ -83,7 +83,7 @@ commands.
 Let's make an adjustment to the settings using the `update` command:
 
 ```
-$ python examples/settings/complete.py settings update --name=hutt --no-is-humanoid
+$ python examples/settings/commands.py settings update --name=hutt --no-is-humanoid
 
 ╭─ Current settings ──────────────────────────────────────────────────────────────────────────╮
 │                                                                                             │
@@ -92,7 +92,7 @@ $ python examples/settings/complete.py settings update --name=hutt --no-is-human
 │   is-humanoid -> False                                                                      │
 │     alignment -> neutral                                                                    │
 │                                                                                             │
-╰─ saved to /home/dusktreader/.local/share/complete.py/settings.json ─────────────────────────╯
+╰─ saved to /home/dusktreader/.local/share/commands.py/settings.json ─────────────────────────╯
 ```
 
 Notice that the `update` command only changed the values specified and left the others alone.
@@ -100,7 +100,7 @@ Notice that the `update` command only changed the values specified and left the 
 Now that we're happy with our settings, lets run our `report` command to try out using these app settings:
 
 ```
-$ python examples/settings/complete.py report
+$ python examples/settings/commands.py report
 Look at this neutral hutt from tatooine slithering by.
 ```
 
@@ -119,7 +119,7 @@ Finally, let's clear out the settings with `reset`:
 │          name -> Field required                                                             │
 │        planet -> Field required                                                             │
 │                                                                                             │
-╰─ saved to /home/dusktreader/.local/share/complete.py/settings.json ─────────────────────────╯
+╰─ saved to /home/dusktreader/.local/share/commands.py/settings.json ─────────────────────────╯
 ```
 
 Now, all the settings are returned to their initial values. Those that have no default values are now invalid.
@@ -154,9 +154,9 @@ from Typer with `--flag` or `--no-flag` controlling the value of the boolean.
 The help text from our example above for the `bind` subcommand looks like this:
 
 ```
-$ python examples/settings/complete.py settings bind --help
+$ python examples/settings/commands.py settings bind --help
 
- Usage: complete.py settings bind [OPTIONS]
+ Usage: commands.py settings bind [OPTIONS]
 
 ╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
 │ *  --name                               TEXT  [default: None] [required]                                                                                                                                                                                                                │
@@ -184,9 +184,9 @@ they are not passed and the `update` command will ignore them.
 The help text from our example above for the `update` subcommand looks like this:
 
 ```
-$ python examples/settings/complete.py settings update --help
+$ python examples/settings/commands.py settings update --help
 
- Usage: complete.py settings update [OPTIONS]
+ Usage: commands.py settings update [OPTIONS]
 
 ╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
 │ --name                               TEXT  [default: None]                                                                                                                                                                                                                              │
@@ -212,9 +212,9 @@ then the corresponding setting value will be unset.
 The help text from our example above for the `unset` subcommand looks like this:
 
 ```
-$ python examples/settings/complete.py settings unset --help
+$ python examples/settings/commands.py settings unset --help
 
- Usage: complete.py settings unset [OPTIONS]
+ Usage: commands.py settings unset [OPTIONS]
 
 ╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
 │ --name                                                                                                                                                                                                                                                                                  │

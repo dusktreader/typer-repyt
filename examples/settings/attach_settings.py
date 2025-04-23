@@ -19,7 +19,7 @@ cli = typer.Typer()
 @cli.command()
 @attach_settings(ExampleSettings)
 def report(ctx: typer.Context, loud: bool = False):
-    settings: ExampleSettings = cast(ExampleSettings, get_settings(ctx))
+    settings = get_settings(ctx, ExampleSettings)
     text: str = dedent(
         f"""
         Look at this {settings.name} from {settings.planet}. It's soooo {settings.alignment}!

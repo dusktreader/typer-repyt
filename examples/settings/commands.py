@@ -1,4 +1,4 @@
-from typing import Annotated, cast
+from typing import Annotated
 
 from pydantic import BaseModel, AfterValidator
 from snick import unwrap
@@ -27,7 +27,7 @@ add_settings_subcommand(cli, SettingsModel)
 @cli.command()
 @attach_settings(SettingsModel)
 def report(ctx: typer.Context):
-    settings = cast(SettingsModel, get_settings(ctx))
+    settings = get_settings(ctx, SettingsModel)
     print(
         unwrap(
             f"""

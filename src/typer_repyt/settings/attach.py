@@ -12,11 +12,11 @@ from typer_repyt.format import terminal_message
 from typer_repyt.settings.manager import SettingsManager
 
 
-def get_settings(ctx: typer.Context) -> BaseModel:
+def get_settings[ST: BaseModel](ctx: typer.Context, type_hint: type[ST]) -> ST:
     return ConfigError.ensure_type(
-        from_context(ctx, "settings"),
-        BaseModel,
-        "Non pydantic model found in user context"
+        get_manager(ctx).settings_instance,
+        type_hint,
+        f"Settings instance doesn't match expected {type_hint=}"
     )
 
 
@@ -51,9 +51,6 @@ def attach_settings(
                     len(manager.invalid_warnings) == 0,
                     f"Initial settings are invalid: {manager.invalid_warnings}",
                 )
-            to_context(ctx, "settings", manager.settings_instance)
-
-            # TODO: test this
             to_context(ctx, "settings_manager", manager)
 
             ret_val = func(ctx, *args, **kwargs)

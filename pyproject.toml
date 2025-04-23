@@ -1,6 +1,6 @@
 [project]
 name = "typer-repyt"
-version = "0.3.0"
+version = "0.4.0"
 description = "Tools to extended functionality for typer based CLIs"
 authors = [
     {name = "Tucker Beck", email ="tucker.beck@gmail.com"},
@@ -76,6 +76,7 @@ src = ["src/typer_repyt", "tests"]
 
 [tool.mypy]
 pretty = true
+check_untyped_defs = true
 files = ["src/typer_repyt", "tests"]
 
 

@@ -24,3 +24,12 @@ pip install typer-repyt
 
 The complete documentation can be found at the
 [typer-repyt home page](https://dusktreader.github.io/typer-repyt)
+
+
+## Demo
+
+To see the features in action, you can run the demo in an isolated environment with `uv`:
+
+```
+uvx --from=typer-repyt[demo] typer-repyt-demo
+```

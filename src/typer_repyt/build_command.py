@@ -1,16 +1,17 @@
 import ast
-from functools import reduce
+from functools import reduce, update_wrapper
 import inspect
 import textwrap
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, cast, Literal
 from types import UnionType
 
+from inflection import dasherize
 import typer
 
 from typer_repyt.constants import Sentinel
-from typer_repyt.exceptions import RepytError
+from typer_repyt.exceptions import BuildCommandError
 
 
 @dataclass
@@ -56,17 +57,55 @@ class ArgDef(ParamDef):
     show_envvar: bool = True
 
 
-def build_command(cli: typer.Typer, func: Callable[..., None], *param_defs: ParamDef):
+@dataclass
+class DecDef:
+    """
+    Define a decorator function and it parameters.
+    """
+    dec_func: Callable[..., Any]
+    dec_args: list[Any] = field(default_factory=list)
+    dec_kwargs: dict[str, Any] = field(default_factory=dict)
+    is_simple: bool = True
+
+    def decorate(self, f: Callable[..., Any]) -> Callable[..., Any]:
+        BuildCommandError.require_condition(
+            not self.is_simple or (self.dec_args == [] and self.dec_kwargs == {}),
+            "Decorator arguments are not allowed for simple decorators",
+        )
+
+        def wrap(*args: Any, **kwargs: Any) -> Any:
+            if self.is_simple:
+                return self.dec_func(f)(*args, **kwargs)
+            else:
+                return self.dec_func(*self.dec_args, **self.dec_kwargs)(f)(*args, **kwargs)
+
+        update_wrapper(wrap, f)
+        return wrap
+
+
+
+def build_command(
+    cli: typer.Typer,
+    func: Callable[..., None],
+    /,
+    *param_defs: ParamDef,
+    decorators: list[DecDef] | None = None,
+    include_context: bool | str = False,  # TODO: Think about setting this automatically if func's first arg is ctx
+):
     """
     Build a Typer command dynamically based on a function template and list of argument definitions.
 
     Args:
-        cli:        The Typer app that the command should be added to
-        func:       A "template" function that will be used to build out the final function.
-                    The name of the function will be preserved as will its docstring.
-                    Though it is useful to define arguments for the function that match the opt_defs, it is not necessary.
-                    It will, however, help with static type checking.
-        param_defs: Argument definitions that will be used to dynamically build the Typer command.
+        cli:             The Typer app that the command should be added to
+        func:            A "template" function that will be used to build out the final function.
+                         The name of the function will be preserved as will its docstring.
+                         Though it is useful to define arguments for the function that match the opt_defs, it is not necessary.
+                         It will, however, help with static type checking.
+        param_defs:      Argument definitions that will be used to dynamically build the Typer command.
+        decorators:      An optional list of decorators to apply to the command function. Like regular decorators, they are
+                         applied in reverse order with those nearest to the function definition being called first.
+        include_context: If set, include the `typer.Context` as the first argument to the function. If the value is not
+                         boolean, use the passed string as the name of the context arg.
 
     The following two command definitions are equivalent:
 
@@ -74,7 +113,10 @@ def build_command(cli: typer.Typer, func: Callable[..., None], *param_defs: Para
     cli = typer.Typer()
 
     @cli.command()
+    @simple_decorator
+    @complex_decorator("nitro", glycerine=True)
     def static(
+        t_ctx: Typer.Context,
         mite1: Annotated[str, typer.Argument(help="This is mighty argument 1")],
         dyna2: Annotated[int, typer.Option(help="This is dynamic option 2")],
         dyna1: Annotated[str, typer.Option(help="This is dynamic option 1")] = "default1",
@@ -98,6 +140,11 @@ def build_command(cli: typer.Typer, func: Callable[..., None], *param_defs: Para
         OptDef(name="dyna2", param_type=int, help="This is dynamic option 2"),
         ArgDef(name="mite1", param_type=str, help="This is mighty argument 1"),
         ArgDef(name="mite2", param_type=int | None, help="This is mighty argument 2", default=None),
+        decorators=[
+            DecDef(simple_decorator),
+            DecDef(complex_decorator, dec_args=["nitro"], dec_kwargs=dict(glycerine=True)),
+        ],
+        include_context="t_ctx",
     )
 
     ```
@@ -125,7 +172,7 @@ def build_command(cli: typer.Typer, func: Callable[..., None], *param_defs: Para
         # If the ParamDef is an OptDef, assemble args and keywords for it
         if isinstance(param_def, OptDef):
             if param_def.override_name:
-                param_args.append(ast.Constant(value=f"--{param_def.override_name}"))
+                param_args.append(ast.Constant(value=f"--{dasherize(param_def.override_name)}"))
             if param_def.short_name:
                 param_args.append(ast.Constant(value=f"-{param_def.short_name}"))
             if param_def.callback:
@@ -162,7 +209,7 @@ def build_command(cli: typer.Typer, func: Callable[..., None], *param_defs: Para
 
         # If the ParamDef is not an OptDef or ArgDef, raise an error indicating that it's unsupported
         else:
-            raise RepytError(f"Unsupported parameter definition type: {type(param_def)}")
+            raise BuildCommandError(f"Unsupported parameter definition type: {type(param_def)}")
 
         # Get the type annotation for the opt/arg
         # Just found out that I didn't need to do this (yet) because Typer does not support Union types
@@ -206,17 +253,28 @@ def build_command(cli: typer.Typer, func: Callable[..., None], *param_defs: Para
 
     # Extract the function body from the template function
     source = textwrap.dedent(inspect.getsource(func)).strip()
+
     parsed_ast: ast.Module = ast.parse(source)
-    RepytError.require_condition(
+    BuildCommandError.require_condition(
         len(parsed_ast.body) == 1, "Function template must contain exactly one function definition"
     )
     fdef: ast.FunctionDef = cast(ast.FunctionDef, parsed_ast.body[0])
     body = fdef.body
 
     # Add imports for Annotated, typer.Option, and NoneType
-    annotated_import = ast.ImportFrom(module="typing", names=[ast.alias(name="Annotated")], level=0)
-    typer_import = ast.Import(names=[ast.alias(name="typer")])
-    nonetype_import = ast.ImportFrom(module="types", names=[ast.alias(name="NoneType")], level=0)
+    imports: list[ast.Import | ast.ImportFrom] = [
+        ast.ImportFrom(module="typing", names=[ast.alias(name="Annotated")], level=0),
+        ast.Import(names=[ast.alias(name="typer")]),
+        ast.ImportFrom(module="types", names=[ast.alias(name="NoneType")], level=0),
+        ast.ImportFrom(module="typer", names=[ast.alias(name="Context")], level=0),
+    ]
+
+    # Add the typer context if requested
+    # TODO: Test this
+    if include_context:
+        ctx_name = "ctx" if isinstance(include_context, bool) else include_context
+        ctx_arg = ast.arg(arg=ctx_name, annotation=ast.Name(id="Context"))
+        args.insert(0, ctx_arg)
 
     # Create the function definition
     func_def = ast.FunctionDef(
@@ -230,15 +288,23 @@ def build_command(cli: typer.Typer, func: Callable[..., None], *param_defs: Para
     )
 
     # Compile a module containing the imports and function definition
-    module = ast.Module(body=[annotated_import, typer_import, nonetype_import, func_def])
+    module = ast.Module(body=[*imports, func_def])
     _set_ast_location(module)
     code = compile(module, filename="<ast>", mode="exec")
 
     # execute the compiled module
-    exec(code, globals(), namespace)
+    exec(code, func.__globals__, namespace)
 
-    # Add the function to the Typer app
-    cli.command()(namespace[func.__name__])
+    command_func = namespace[func.__name__]
+
+    # Add decorators to the command function
+    if decorators is not None:
+        with BuildCommandError.handle_errors("There was a problem adding decorators"):
+            for dec_def in reversed(decorators):
+                command_func = dec_def.decorate(command_func)
+
+    # Add the command function to the Typer app
+    cli.command()(command_func)
 
 
 def _set_ast_location(node: ast.AST, lineno: int = 0, col_offset: int = 0):

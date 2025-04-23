@@ -1,6 +1,6 @@
 [project]
 name = "typer-repyt"
-version = "0.2.0"
+version = "0.3.0"
 description = "Tools to extended functionality for typer based CLIs"
 authors = [
     {name = "Tucker Beck", email ="tucker.beck@gmail.com"},
@@ -10,7 +10,9 @@ license-files = ["LICENSE.md"]
 
 requires-python = ">=3.12, ~=3.13"
 dependencies = [
-    "py-buzz>=7.0.0",
+    "inflection>=0.5.1",
+    "py-buzz~=7.3",
+    "pydantic>=2.11.3",
     "snick~=2.1",
     "typer>=0.15.2",
 ]
@@ -20,6 +22,15 @@ dependencies = [
 homepage = "https://github.com/dusktreader/typer-repyt"
 source = "https://github.com/dusktreader/typer-repyt"
 changelog = "https://github.com/dusktreader/typer-repyt/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+demo = [
+    "auto-name-enum>=3.0.0",
+    "rich>=14.0.0",
+]
+
+[project.scripts]
+typer-repyt-demo = "typer_repyt_demo.main:main[cli]"
 
 
 [dependency-groups]
@@ -34,6 +45,7 @@ dev = [
     "pygments~=2.19",
     "pytest~=8.3",
     "pytest-cov~=6.0",
+    "pytest-mock>=3.14.0",
     "pytest-pretty~=1.2",
     "pytest-random-order~=1.1",
     "ruff~=0.11",
@@ -83,7 +95,10 @@ extend-ignore-identifiers-re = []
 
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/typer_repyt"]
+packages = [
+    "src/typer_repyt",
+    "src/typer_repyt_demo",
+]
 
 
 [build-system]

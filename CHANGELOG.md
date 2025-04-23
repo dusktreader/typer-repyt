@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## v0.3.0 - 2025-04-23
+- Completed `settings` functionality including:
+  - the `@attach_settings` decorator
+  - the `get_settings()` function
+  - the `SettingsManager`
+  - the various `settings` subcommands
+  - the `add_settings_subcommand()` function
+- Added documentation for the `settings` feature
+- Added demos for the `settings`  and `build_command` features
+
+
 ## v0.2.0 - 2025-04-17
 - Renamed the project to `typer-repyt`
 - Completed `build_command` function

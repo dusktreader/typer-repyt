@@ -1,8 +1,9 @@
+from itertools import pairwise
 import re
 from typing import Any
 
 import typer
-from snick import strip_ansi_escape_sequences, strip_whitespace, dedent, indent
+from snick import conjoin, strip_ansi_escape_sequences, strip_whitespace, dedent, indent
 from typer.testing import CliRunner
 
 
@@ -15,15 +16,30 @@ def get_output(
     exit_code: int = 0,
     env_vars: dict[str, str] | None = None,
     strip_terminal_controls: bool = True,
+    exception_type: type[Exception] | None = None,
+    exception_pattern: str | None = None,
     **kwargs: Any,
 ) -> str:
     if env_vars is None:
         env_vars = {}
     result = runner.invoke(cli, args, env=env_vars, **kwargs)
-    assert result.exit_code == exit_code
     output = result.stdout
     if strip_terminal_controls:
         output = strip_ansi_escape_sequences(output)
+    assert result.exit_code == exit_code, build_code_fail_message(exit_code, result.exit_code, output, result.exception)
+    if exception_type:
+        assert isinstance(result.exception, exception_type), build_exception_type_message(
+            result.exception,
+            exception_type,
+            output,
+        )
+    if exception_pattern:
+        assert re.search(exception_pattern, str(result.exception)), build_exception_pattern_message(
+            result.exception,
+            exception_pattern,
+            output,
+        )
+
     return output
 
 
@@ -35,11 +51,9 @@ def check_output(
     cli: typer.Typer,
     *args: str,
     expected_substring: str | list[str] | None = None,
-    exit_code: int = 0,
-    env_vars: dict[str, str] | None = None,
     **kwargs: Any,
 ):
-    output = get_output(cli, *args, exit_code=exit_code, env_vars=env_vars, **kwargs)
+    output = get_output(cli, *args, **kwargs)
     if not expected_substring:
         return
     elif isinstance(expected_substring, str):
@@ -48,61 +62,137 @@ def check_output(
         assert es in output, output
 
 
-def check_help(
-    cli: typer.Typer,
-    expected_substring: str | list[str] | None = None,
-    env_vars: dict[str, str] | None = None,
-    **kwargs: Any,
-):
-    check_output(cli, "--help", expected_substring=expected_substring, exit_code=0, env_vars=env_vars, **kwargs)
+def check_help(cli: typer.Typer, **kwargs: Any):
+    check_output(cli, "--help", exit_code=0, **kwargs)
 
 
 def match_output(
     cli: typer.Typer,
     *args: str,
     expected_pattern: str | list[str] | None = None,
-    exit_code: int = 0,
-    env_vars: dict[str, str] | None = None,
+    negative_pattern: bool = False,
+    enforce_order: bool = True,
     **kwargs: Any,
 ):
-    output = get_output(cli, *args, exit_code=exit_code, env_vars=env_vars, **kwargs)
+    output = get_output(cli, *args, **kwargs)
     if not expected_pattern:
         return
     elif isinstance(expected_pattern, str):
         expected_pattern = [expected_pattern]
-    for ep in expected_pattern:
-        mangle_pattern = ep
-        mangle_pattern = mangle_pattern.replace("[", r"\[")
-        mangle_pattern = mangle_pattern.replace("]", r"\]")
-        mangle_pattern = strip_whitespace(mangle_pattern)
 
-        mangle_help_text = output
-        mangle_help_text = strip_whitespace(mangle_help_text)
+    start_positions: list[int] = []
+    for ep in expected_pattern:
+        mangled_pattern = ep
+        mangled_pattern = strip_whitespace(mangled_pattern)
+
+        mangled_output = output
+        mangled_output = strip_whitespace(mangled_output)
 
         rounded = ["╭", "─", "┬", "╮", "│", "├", "┼", "┤", "╰", "┴", "╯"]
         for char in rounded:
-            mangle_help_text = mangle_help_text.replace(char, "")
+            mangled_output = mangled_output.replace(char, "")
 
+        match: re.Match[str] | None = re.search(mangled_pattern, mangled_output)
+        if match is not None:
+            start_positions.append(match.start())
 
+        did_match = match is not None
+        if negative_pattern:
+            did_match = not did_match
+        assert did_match, build_pattern_fail_message(
+            ep,
+            mangled_pattern,
+            output,
+            mangled_output,
+            negative_pattern=negative_pattern
+        )
 
-        assert re.search(mangle_pattern, mangle_help_text) is not None, build_fail_message(
-            ep, mangle_pattern, output, mangle_help_text
+    if enforce_order:
+        assert all(left <= right for (left, right) in pairwise(start_positions)), build_order_fail_message(
+            expected_pattern,
+            start_positions,
+            output
         )
 
 
 def match_help(
     cli: typer.Typer,
-    expected_pattern: str | list[str] | None = None,
-    env_vars: dict[str, str] | None = None,
     **kwargs: Any,
 ):
-    match_output(cli, "--help", expected_pattern=expected_pattern, exit_code=0, env_vars=env_vars, **kwargs)
+    match_output(cli, "--help", exit_code=0, **kwargs)
 
 
-def build_fail_message(pattern: str, mangled_pattern: str, output: str, mangled_output: str):
+def build_code_fail_message(
+    expected_code: int,
+    computed_code: int,
+    output: str,
+    exception: BaseException | None,
+) -> str:
     return dedent(
         f"""
-        Search pattern was not found in help_text
+        Exit codes didn't match!
+
+        Expected {expected_code}
+        Computed {computed_code}
+
+        Exception:
+        {exception}
+
+        Output:
+        {indent(output, prefix="            ", skip_first_line=True)}
+        """
+    )
+
+
+def build_exception_type_message(
+    exception: BaseException | None,
+    exception_type: type[Exception],
+    output: str,
+) -> str:
+    return dedent(
+        f"""
+        Expected exception type doesn't match!
+
+        Expected {exception_type}
+        Computed {type[exception]}
+
+        Exception:
+        {exception}
+
+        Output:
+        {indent(output, prefix="            ", skip_first_line=True)}
+        """
+    )
+
+
+def build_exception_pattern_message(
+    exception: BaseException | None,
+    exception_pattern: str,
+    output: str,
+) -> str:
+    return dedent(
+        f"""
+        Expected exception text doesn't match pattern!
+
+        Expected {exception_pattern}
+        Computed {exception}
+
+        Output:
+        {indent(output, prefix="            ", skip_first_line=True)}
+        """
+    )
+
+def build_pattern_fail_message(
+    pattern: str,
+    mangled_pattern: str,
+    output: str,
+    mangled_output: str,
+    negative_pattern: bool = False,
+) -> str:
+    qualifier = "was not found" if not negative_pattern else "WAS FOUND"
+    return dedent(
+        f"""
+        Search pattern {qualifier} in output
 
         Search Pattern:
         {pattern}
@@ -110,10 +200,20 @@ def build_fail_message(pattern: str, mangled_pattern: str, output: str, mangled_
         "Mangled" Search Pattern:
         {repr(mangled_pattern)}
 
-        Help Text:
+        Output:
         {indent(output, prefix="            ", skip_first_line=True)}
 
-        "Mangled" Help Text:
+        "Mangled" Output:
         {repr(mangled_output)}
         """
+    )
+
+def build_order_fail_message(expected_patterns: list[str], start_positions: list[int], output: str) -> str:
+    return conjoin(
+        "Search patterns were out of order",
+        "",
+        *[f"{i}: {p}" for (i, p) in zip(start_positions, expected_patterns)],
+        "",
+        "Output:",
+        output,
     )

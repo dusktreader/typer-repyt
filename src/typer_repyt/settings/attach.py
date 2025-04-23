@@ -1,0 +1,78 @@
+from collections.abc import Callable
+from functools import wraps
+from typing import Concatenate, ParamSpec, TypeVar
+
+import typer
+from pydantic import BaseModel
+
+from typer_repyt.constants import Validation
+from typer_repyt.context import from_context, to_context, get_app_name
+from typer_repyt.exceptions import ConfigError
+from typer_repyt.format import terminal_message
+from typer_repyt.settings.manager import SettingsManager
+
+
+def get_settings(ctx: typer.Context) -> BaseModel:
+    return ConfigError.ensure_type(
+        from_context(ctx, "settings"),
+        BaseModel,
+        "Non pydantic model found in user context"
+    )
+
+
+def get_manager(ctx: typer.Context) -> SettingsManager:
+    return ConfigError.ensure_type(
+        from_context(ctx, "settings_manager"),
+        SettingsManager,
+        "Non-manager found in user context"
+    )
+
+
+P = ParamSpec("P")
+T = TypeVar("T")
+ContextFunction = Callable[Concatenate[typer.Context, P], T]
+
+def attach_settings(
+    settings_model: type[BaseModel],
+    *,
+    validation: Validation = Validation.BEFORE,
+    persist: bool = False,
+    show: bool = False,
+) -> Callable[[ContextFunction[P, T]], ContextFunction[P, T]]:
+
+    def _decorate(func: ContextFunction[P, T]) -> ContextFunction[P, T]:
+
+        @wraps(func)
+        def wrapper(ctx: typer.Context, *args: P.args, **kwargs: P.kwargs) -> T:
+            manager: SettingsManager = SettingsManager(get_app_name(ctx), settings_model)
+
+            if validation & Validation.BEFORE:
+                ConfigError.require_condition(
+                    len(manager.invalid_warnings) == 0,
+                    f"Initial settings are invalid: {manager.invalid_warnings}",
+                )
+            to_context(ctx, "settings", manager.settings_instance)
+
+            # TODO: test this
+            to_context(ctx, "settings_manager", manager)
+
+            ret_val = func(ctx, *args, **kwargs)
+
+            if validation & Validation.AFTER:
+                with ConfigError.handle_errors("Final settings are invalid"):
+                   manager.validate()
+
+            if persist:
+                manager.save()
+            if show:
+                terminal_message(
+                    manager.pretty(),
+                    subject="Current settings",
+                    footer=f"saved to {manager.settings_path}" if persist else None,
+                )
+
+            return ret_val
+
+        return wrapper
+
+    return _decorate

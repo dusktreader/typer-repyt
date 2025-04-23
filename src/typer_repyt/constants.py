@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import Enum, Flag, auto
 
 
 class Sentinel(Enum):
@@ -10,3 +10,13 @@ class Sentinel(Enum):
 
     MISSING = auto()
     NOT_GIVEN = auto()
+
+
+class Validation(Flag):
+    """
+    Defines whether validation should happen "before", "after", "both", or "none"
+    """
+    BEFORE = auto()
+    AFTER = auto()
+    BOTH = BEFORE | AFTER
+    NONE = 0

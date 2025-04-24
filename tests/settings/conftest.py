@@ -2,14 +2,8 @@ from collections.abc import Generator
 from pathlib import Path
 
 import pytest
-from typer.testing import CliRunner
 
 from typer_repyt.env import tweak_env
-
-
-@pytest.fixture
-def runner() -> CliRunner:
-    return CliRunner()
 
 
 @pytest.fixture

@@ -16,6 +16,8 @@ class Feature(AutoNameEnum):
     build_command = auto()
     attach_settings = auto()
     settings_commands = auto()
+    attach_cache = auto()
+    cache_commands = auto()
 
 
 def start(

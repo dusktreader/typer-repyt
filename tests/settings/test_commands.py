@@ -3,8 +3,8 @@ from pathlib import Path
 
 import typer
 
-from typer_repyt.exceptions import ConfigError
 from typer_repyt.settings.commands import add_bind, add_reset, add_settings_subcommand, add_show, add_unset, add_update
+from typer_repyt.settings.exceptions import SettingsError
 
 from tests.helpers import match_help, match_output
 from tests.settings.models import DefaultSettingsModel, RequiredFieldsModel
@@ -52,7 +52,7 @@ class TestBind:
             "--planet=nal hutta",
             "--alignment=invalid-alignment",
             exit_code=1,
-            exception_type=ConfigError,
+            exception_type=SettingsError,
             exception_pattern="Final settings are invalid",
             prog_name="test",
         )
@@ -114,7 +114,7 @@ class TestUpdate:
             "name.*hutt",
             "is-humanoid.*True",
             "alignment.*neutral",
-            "Configuration is invalid:",
+            "Settings are invalid:",
             "planet.*Field required",
             f"saved to {str(fake_settings_path)[:40]}",
         ]
@@ -203,7 +203,7 @@ class TestUnset:
         expected_pattern = [
             "is-humanoid.*True",
             "alignment.*evil",
-            "Configuration is invalid:",
+            "Settings are invalid:",
             "name.*Field required",
             "planet.*Field required",
             f"saved to {str(fake_settings_path)[:40]}",
@@ -292,7 +292,7 @@ class TestReset:
         expected_pattern = [
             "is-humanoid.*True",
             "alignment.*neutral",
-            "Configuration is invalid:",
+            "Settings are invalid:",
             "name.*Field required",
             "planet.*Field required",
             f"saved to {str(fake_settings_path)[:40]}",
@@ -301,6 +301,7 @@ class TestReset:
             cli,
             expected_pattern=expected_pattern,
             prog_name="test",
+            input="y",
         )
 
         assert fake_settings_path.exists()

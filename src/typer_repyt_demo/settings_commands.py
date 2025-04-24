@@ -1,5 +1,5 @@
 """
-This set of demos shows the use of the varioous settings-related commands.
+This set of demos shows the use of the various settings-related commands.
 """
 
 import json
@@ -8,6 +8,7 @@ from pathlib import Path
 import typer
 from pydantic import BaseModel
 from typer_repyt.settings.commands import add_settings_subcommand
+from typer_repyt_demo.helpers import fake_input
 
 
 def demo_1__bind__basic():
@@ -188,7 +189,9 @@ def demo_9__reset():
 
     Note:
         To demonstrate this working, we need to hack the settings file
-        before the command is invoked.
+        before the command is invoked. We also need to add a forced
+        confirmation because this command requires you to confirm before
+        it proceeds.
     """
 
     class ExampleSettings(BaseModel):
@@ -211,4 +214,6 @@ def demo_9__reset():
 
     cli = typer.Typer()
     add_settings_subcommand(cli, ExampleSettings)
+
+    fake_input("y")
     cli(["settings", "reset"])

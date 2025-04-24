@@ -1,13 +1,13 @@
 from typing import Any, Literal
 
 import snick
-from rich.console import Console
+from rich.console import Console, RenderableType
 from rich.markdown import Markdown
 from rich.panel import Panel
 
 
 def terminal_message(
-    message: str,
+    message: str | RenderableType,
     subject: str | None = None,
     subject_align: Literal["left", "right", "center"] = "left",
     color: str = "green",
@@ -21,15 +21,15 @@ def terminal_message(
         panel_kwargs["title"] = f"[{color}]{subject}"
     if footer is not None:
         panel_kwargs["subtitle"] = f"[dim italic]{footer}[/dim italic]"
-    text: str = snick.dedent(message)
-    if indent:
-        text = snick.indent(text, prefix="  ")
-    content: str | Markdown = text
-    if markdown:
-        content = Markdown(text)
+    if isinstance(message, str):
+        message = snick.dedent(message)
+        if indent:
+            message = snick.indent(message, prefix="  ")
+        if markdown:
+            message = Markdown(message)
     console = Console()
     console.print()
-    console.print(Panel(content, **panel_kwargs))
+    console.print(Panel(message, **panel_kwargs))
     console.print()
 
 

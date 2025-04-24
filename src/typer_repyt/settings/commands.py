@@ -6,8 +6,8 @@ from pydantic import BaseModel
 
 from typer_repyt.build_command import DecDef, build_command, OptDef
 from typer_repyt.constants import Sentinel, Validation
-from typer_repyt.exceptions import ConfigError
 from typer_repyt.settings.attach import get_manager, attach_settings
+from typer_repyt.settings.exceptions import SettingsError
 from typer_repyt.settings.manager import SettingsManager
 
 
@@ -22,7 +22,7 @@ def add_bind(cli: typer.Typer, settings_model: type[BaseModel]):
     opt_defs: list[OptDef] = []
     for name, field_info in settings_model.model_fields.items():
         default = field_info.default if field_info.default is not PydanticUndefined else Sentinel.NOT_GIVEN
-        param_type: type[Any] = ConfigError.enforce_defined(
+        param_type: type[Any] = SettingsError.enforce_defined(
             field_info.annotation, "Option type may not be `None`"
         )  # TODO: Figure out if this can even be triggered
         opt_defs.append(
@@ -60,7 +60,7 @@ def update(ctx: typer.Context):
 def add_update(cli: typer.Typer, settings_model: type[BaseModel]):
     opt_defs: list[OptDef] = []
     for name, field_info in settings_model.model_fields.items():
-        param_type: type[Any] = ConfigError.enforce_defined(field_info.annotation, "Option type may not be `None`")
+        param_type: type[Any] = SettingsError.enforce_defined(field_info.annotation, "Option type may not be `None`")
         default: None | bool = None
         if param_type is bool:
             default = field_info.default
@@ -146,8 +146,8 @@ def add_show(cli: typer.Typer, settings_model: type[BaseModel]):
     )
 
 
-# TODO: consider whether reset should require confirmation
 def reset(ctx: typer.Context):
+    typer.confirm("Are you sure you want to reset your settings?", abort=True)
     __manager: SettingsManager = get_manager(ctx)
     __manager.reset()
 

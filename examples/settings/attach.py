@@ -1,10 +1,9 @@
 from typing import Annotated
 
+import typer
 from pydantic import BaseModel, AfterValidator
 from snick import unwrap
-import typer
 
-from typer_repyt.settings.commands import add_settings_subcommand
 from typer_repyt.settings.attach import attach_settings, get_settings
 
 
@@ -15,14 +14,13 @@ def valid_alignment(value: str) -> str:
 
 
 class SettingsModel(BaseModel):
-    name: str
-    planet: str
+    name: str = "jawa"
+    planet: str = "tatooine"
     is_humanoid: bool = True
     alignment: Annotated[str, AfterValidator(valid_alignment)] = "neutral"
 
 
 cli = typer.Typer()
-add_settings_subcommand(cli, SettingsModel)
 
 
 @cli.command()

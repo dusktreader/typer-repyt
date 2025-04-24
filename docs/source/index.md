@@ -19,5 +19,6 @@ This Python package adds extended functionality for Typer CLIs.
 Many features are planned, but these are the ones that are available thus far:
 
 - [Building Commands Dynamically](features/build_command.md)
-- [Settings management commands](features/settings.md)
+- [Settings management & commands](features/settings.md)
+- [Cache management & commands](features/cache.md)
 

@@ -46,6 +46,11 @@ def pseudo_clear(console: Console):
         console.print(BlankLine)
 
 
+def fake_input(text: str):
+    sys.stdin.write(text)
+    sys.stdin.seek(0)
+
+
 def get_demo_functions(module_name: str) -> list[Callable[..., None]]:
     demo_functions: list[Callable[..., None]] = []
     module = import_module(f"typer_repyt_demo.{module_name}")
@@ -100,6 +105,10 @@ def capture(demo: Callable[..., None]) -> Captured:
     original_stderr = sys.stderr
     sys.stderr = stderr_buffer
 
+    stdin_buffer = io.StringIO()
+    original_stdin = sys.stdin
+    sys.stdin = stdin_buffer
+
     original_argv = sys.argv
     sys.argv = [demo_name]
 
@@ -119,6 +128,7 @@ def capture(demo: Callable[..., None]) -> Captured:
                     cap.settings = fake_settings_path.read_text()
                 sys.stdout = original_stdout
                 sys.stderr = original_stderr
+                sys.stdin = original_stdin
                 sys.argv = original_argv
 
     stdout_dump = stdout_buffer.getvalue()

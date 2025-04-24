@@ -10,7 +10,7 @@ from pytest_mock import MockerFixture
 from typer.testing import CliRunner
 
 from typer_repyt.env import tweak_env
-from typer_repyt.exceptions import ConfigInitError, ConfigSaveError, ConfigUpdateError
+from typer_repyt.settings.exceptions import SettingsInitError, SettingsSaveError, SettingsUpdateError
 from typer_repyt.settings.manager import SettingsManager, get_settings_path
 
 
@@ -119,7 +119,7 @@ class TestSettingsManager:
 
     def test_init__raises_error_on_failure(self, mocker: MockerFixture):
         mocker.patch.object(DefaultSettingsModel, "__init__", side_effect=RuntimeError("BOOM"))
-        with pytest.raises(ConfigInitError, match="Failed to initialize settings"):
+        with pytest.raises(SettingsInitError, match="Failed to initialize settings"):
             SettingsManager("test", DefaultSettingsModel)
 
     def test_set_warnings__unpacks_validation_error(self):
@@ -182,7 +182,7 @@ class TestSettingsManager:
     def test_update__raises_error_on_failure(self, mocker: MockerFixture):
         manager = SettingsManager("test", DefaultSettingsModel)
         mocker.patch.object(manager.settings_model, "__init__", side_effect=RuntimeError("BOOM"))
-        with pytest.raises(ConfigUpdateError, match="Failed to update settings"):
+        with pytest.raises(SettingsUpdateError, match="Failed to update settings"):
             manager.update()
 
     def test_unset__resets_field_to_default(self):
@@ -258,7 +258,7 @@ class TestSettingsManager:
             [bold]is-humanoid[/bold] -> True
             [bold]  alignment[/bold] -> [red]negative[/red]
 
-            [red]Configuration is invalid:[/red]
+            [red]Settings are invalid:[/red]
             [bold]     planet[/bold] -> Field required
             [bold]  alignment[/bold] -> Value error, negative is an invalid alignment
             """
@@ -279,7 +279,7 @@ class TestSettingsManager:
             is-humanoid -> True
               alignment -> negative
 
-            Configuration is invalid:
+            Settings are invalid:
                  planet -> Field required
               alignment -> Value error, negative is an invalid alignment
             """
@@ -299,5 +299,5 @@ class TestSettingsManager:
     def test_save__raises_error_on_failure(self, mocker: MockerFixture):
         manager = SettingsManager("test", DefaultSettingsModel)
         mocker.patch.object(manager, "settings_path").write_text.side_effect = RuntimeError("BOOM")
-        with pytest.raises(ConfigSaveError, match="Failed to save settings"):
+        with pytest.raises(SettingsSaveError, match="Failed to save settings"):
             manager.save()

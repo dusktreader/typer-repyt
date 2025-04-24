@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## v0.5.0 - 2025-04-24
+- Completed the `cache` functionality including:
+  - the `@attach_cache` decorator
+  - the `get_manager()` function
+  - the `CacheManager`
+  - The various `cache` subcommands
+  - the `add_cach_subcommand()` function
+- Added documentation for the `cache` feature
+- Added demos for the `cache` feature
+
+
 ## v0.4.1 - 2025-04-23
 - Some small enhancements to the demo
 

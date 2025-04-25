@@ -4,9 +4,22 @@
 [![Documentation Status](https://github.com/dusktreader/typer-repyt/actions/workflows/docs.yml/badge.svg)](https://dusktreader.github.io/typer-repyt/)
 
 
+> [!IMPORTANT] Open to work
+> I'm looking for a job right now! If you know of any openings that match my skill-set, please let me know! You can
+> read my resume over at my [cv site](https://cv.dusktreader.dev). Thanks!
+
+
 ![typer-repyt-logo](https://github.com/dusktreader/typer-repyt/blob/main/docs/source/images/logo-dark.png)
 
 _Tools to extended functionality for typer based CLIs_
+
+
+## Features
+
+- [Settings management & commands](https://dusktreader.github.io/typer-repyt/features/settings)
+- [Cache management & commands](https://dusktreader.github.io/typer-repyt/features/cache)
+- [User-friendly error handling](https://dusktreader.github.io/typer-repyt/features/exceptions)
+- [Building Commands Dynamically](https://dusktreader.github.io/typer-repyt/features/build_command)
 
 
 ## Super-quick Start

@@ -135,7 +135,7 @@ Note that you have to confirm whenever you request to clear the entire cache to 
 
 ## Details
 
-Let's take a closer look at the details of each `cache` subcommand and the methos of the `CacheManager`:
+Let's take a closer look at the details of each `cache` subcommand and the methods of the `CacheManager`:
 
 
 ### `clear`

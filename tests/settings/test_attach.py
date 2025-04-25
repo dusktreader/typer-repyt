@@ -72,8 +72,7 @@ class TestAttachSettings:
         match_output(
             cli,
             exit_code=1,
-            expected_pattern=expected_pattern,
-            negative_pattern=True,
+            unwanted_pattern=expected_pattern,
             exception_type=SettingsError,
             exception_pattern="Initial settings are invalid",
             prog_name="test",

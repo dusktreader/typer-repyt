@@ -3,10 +3,13 @@ from typing import Annotated
 import typer
 
 from typer_repyt.cache.attach import get_manager, attach_cache
+from typer_repyt.cache.exceptions import CacheError
 from typer_repyt.cache.manager import CacheManager
+from typer_repyt.exceptions import handle_errors
 from typer_repyt.format import terminal_message
 
 
+@handle_errors("Failed to clear cache", handle_exc_class=CacheError)
 @attach_cache()
 def clear(
     ctx: typer.Context,
@@ -29,6 +32,7 @@ def add_clear(cli: typer.Typer):
     cli.command()(clear)
 
 
+@handle_errors("Failed to show cache", handle_exc_class=CacheError)
 @attach_cache(show=True)
 def show(ctx: typer.Context):  # pyright: ignore[reportUnusedParameter]
     pass

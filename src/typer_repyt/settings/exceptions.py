@@ -1,8 +1,9 @@
+from typer_repyt.constants import ExitCode
 from typer_repyt.exceptions import RepytError
 
 
 class SettingsError(RepytError):
-    pass
+    exit_code: ExitCode = ExitCode.GENERAL_ERROR
 
 
 class SettingsInitError(SettingsError):

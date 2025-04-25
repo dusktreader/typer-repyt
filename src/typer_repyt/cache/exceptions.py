@@ -1,8 +1,9 @@
+from typer_repyt.constants import ExitCode
 from typer_repyt.exceptions import RepytError
 
 
 class CacheError(RepytError):
-    pass
+    exit_code: ExitCode = ExitCode.GENERAL_ERROR
 
 
 class CacheInitError(CacheError):
@@ -10,10 +11,6 @@ class CacheInitError(CacheError):
 
 
 class CacheStoreError(CacheError):
-    pass
-
-
-class CacheFreeError(CacheError):
     pass
 
 

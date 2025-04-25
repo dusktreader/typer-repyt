@@ -36,11 +36,12 @@ In the `report` command, you can see how the settings values may be accessed wit
 `@attach_settings` decorator adds the settings object to the app's `typer.Context`. Then, the `get_settings()` function
 can be called to retrieve an instance of the `SettingsModel` from the app context.
 
-!!!note "Casting `get_settings()`"
+!!!note "Passing `type_hint` to `get_settings()`"
 
-    You don't _have_ to cast the result of `get_settings()` to your model type for the code to work. However, static
-    type checkers will object. Because the model is bound to the settings commands _dynamically_, it's not possible for
-    the `get_settings()` function to return the instance already cast to your app's pwrticular settings model.
+    You don't _have_ to pass a type_hint to `get_settings()` for the code to work. However, static type checkers will
+    object if you try to assign the returned model instance to your specific settings model. Because the model is bound
+    to the settings commands _dynamically_, the `get_settings()` function needs a type hint to cast it to the
+    appropriate model type.
 
 Great, now let's try a few commands in this app to see how the settings commands work.
 

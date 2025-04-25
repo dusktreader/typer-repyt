@@ -5,6 +5,7 @@ from types import NoneType, UnionType
 from buzz import require_condition
 import typer
 
+from typer_repyt.cache.manager import CacheManager
 from typer_repyt.exceptions import ContextError
 from typer_repyt.settings.manager import SettingsManager
 
@@ -12,6 +13,7 @@ from typer_repyt.settings.manager import SettingsManager
 @dataclass
 class RepytContext:
     settings_manager: SettingsManager | None = None
+    cache_manager: CacheManager | None = None
 
 
 def get_user_context(ctx: typer.Context):
@@ -20,7 +22,7 @@ def get_user_context(ctx: typer.Context):
     return ctx.obj
 
 
-def to_context(ctx: typer.Context, name: str, val: SettingsManager):
+def to_context(ctx: typer.Context, name: str, val: SettingsManager | CacheManager):
     user_context = get_user_context(ctx)
     field_type = RepytContext.__dataclass_fields__[name].type
 
@@ -39,7 +41,7 @@ def to_context(ctx: typer.Context, name: str, val: SettingsManager):
     setattr(user_context, name, val)
 
 
-def from_context(ctx: typer.Context, name: str) -> SettingsManager:
+def from_context(ctx: typer.Context, name: str) -> SettingsManager | CacheManager:
     user_context = get_user_context(ctx)
     return ContextError.enforce_defined(getattr(user_context, name), f"{name} is not bound to context")
 

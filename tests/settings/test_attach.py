@@ -7,8 +7,9 @@ from pydantic import BaseModel
 from typer.testing import CliRunner
 
 from typer_repyt.constants import Validation
-from typer_repyt.exceptions import ConfigError, ContextError
+from typer_repyt.exceptions import ContextError
 from typer_repyt.settings.attach import attach_settings, get_manager, get_settings
+from typer_repyt.settings.exceptions import SettingsError
 
 from tests.helpers import match_output
 from tests.settings.models import DefaultSettingsModel, RequiredFieldsModel
@@ -17,7 +18,7 @@ from typer_repyt.settings.manager import SettingsManager
 
 class TestAttachSettings:
     def test_attach_settings__adds_settings_to_context(self, runner: CliRunner):
-        cli = typer.Typer()
+        cli: typer.Typer = typer.Typer()
 
         @cli.command()
         @attach_settings(DefaultSettingsModel)
@@ -73,7 +74,7 @@ class TestAttachSettings:
             exit_code=1,
             expected_pattern=expected_pattern,
             negative_pattern=True,
-            exception_type=ConfigError,
+            exception_type=SettingsError,
             exception_pattern="Initial settings are invalid",
             prog_name="test",
         )
@@ -93,7 +94,7 @@ class TestAttachSettings:
             cli,
             exit_code=1,
             expected_pattern=expected_pattern,
-            exception_type=ConfigError,
+            exception_type=SettingsError,
             exception_pattern="Final settings are invalid",
             prog_name="test",
         )
@@ -122,7 +123,7 @@ class TestAttachSettings:
         match_output(
             cli,
             exit_code=1,
-            exception_type=ConfigError,
+            exception_type=SettingsError,
             exception_pattern=exception_pattern,
             prog_name="test",
         )
@@ -270,7 +271,7 @@ class TestGetSettings:
 
         match_output(
             cli,
-            exception_type=ConfigError,
+            exception_type=SettingsError,
             exception_pattern="instance doesn't match expected",
             exit_code=1,
             prog_name="test",
@@ -312,8 +313,8 @@ class TestGetManager:
 
         match_output(
             cli,
-            exception_type=ConfigError,
-            exception_pattern="Non-manager found in user context",
+            exception_type=SettingsError,
+            exception_pattern="Item in user context at `settings_manager` was not a SettingsManager",
             exit_code=1,
             prog_name="test",
         )

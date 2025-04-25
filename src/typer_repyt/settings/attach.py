@@ -7,20 +7,22 @@ from pydantic import BaseModel
 
 from typer_repyt.constants import Validation
 from typer_repyt.context import from_context, to_context, get_app_name
-from typer_repyt.exceptions import ConfigError
 from typer_repyt.format import terminal_message
+from typer_repyt.settings.exceptions import SettingsError
 from typer_repyt.settings.manager import SettingsManager
 
 
 def get_settings[ST: BaseModel](ctx: typer.Context, type_hint: type[ST]) -> ST:
-    return ConfigError.ensure_type(
+    return SettingsError.ensure_type(
         get_manager(ctx).settings_instance, type_hint, f"Settings instance doesn't match expected {type_hint=}"
     )
 
 
 def get_manager(ctx: typer.Context) -> SettingsManager:
-    return ConfigError.ensure_type(
-        from_context(ctx, "settings_manager"), SettingsManager, "Non-manager found in user context"
+    return SettingsError.ensure_type(
+        from_context(ctx, "settings_manager"),
+        SettingsManager,
+        "Item in user context at `settings_manager` was not a SettingsManager",
     )
 
 
@@ -42,7 +44,7 @@ def attach_settings(
             manager: SettingsManager = SettingsManager(get_app_name(ctx), settings_model)
 
             if validation & Validation.BEFORE:
-                ConfigError.require_condition(
+                SettingsError.require_condition(
                     len(manager.invalid_warnings) == 0,
                     f"Initial settings are invalid: {manager.invalid_warnings}",
                 )
@@ -51,7 +53,7 @@ def attach_settings(
             ret_val = func(ctx, *args, **kwargs)
 
             if validation & Validation.AFTER:
-                with ConfigError.handle_errors("Final settings are invalid"):
+                with SettingsError.handle_errors("Final settings are invalid"):
                     manager.validate()
 
             if persist:

@@ -5,12 +5,12 @@ from typing import Any, cast
 from inflection import dasherize
 from pydantic import BaseModel, ValidationError
 
-from typer_repyt.exceptions import (
-    ConfigInitError,
-    ConfigResetError,
-    ConfigSaveError,
-    ConfigUnsetError,
-    ConfigUpdateError,
+from typer_repyt.settings.exceptions import (
+    SettingsInitError,
+    SettingsResetError,
+    SettingsSaveError,
+    SettingsUnsetError,
+    SettingsUpdateError,
 )
 
 
@@ -25,7 +25,7 @@ class SettingsManager:
         self.settings_path: Path = get_settings_path(self.app_name)
         self.invalid_warnings: dict[str, str] = {}
         self.settings_instance: BaseModel
-        with ConfigInitError.handle_errors("Failed to initialize settings"):
+        with SettingsInitError.handle_errors("Failed to initialize settings"):
             settings_values: dict[str, Any] = {}
             if self.settings_path.exists():
                 settings_values = json.loads(self.settings_path.read_text())
@@ -43,7 +43,7 @@ class SettingsManager:
             self.invalid_warnings[key] = message
 
     def update(self, **settings_values: Any):
-        with ConfigUpdateError.handle_errors("Failed to update settings"):
+        with SettingsUpdateError.handle_errors("Failed to update settings"):
             combined_settings = {**self.settings_instance.model_dump(), **settings_values}
             try:
                 self.settings_instance = self.settings_model(**combined_settings)
@@ -53,7 +53,7 @@ class SettingsManager:
                 self.set_warnings(err)
 
     def unset(self, *unset_keys: str):
-        with ConfigUnsetError.handle_errors("Failed to remove keys"):
+        with SettingsUnsetError.handle_errors("Failed to remove keys"):
             settings_values = {k: v for (k, v) in self.settings_instance.model_dump().items() if k not in unset_keys}
             try:
                 self.settings_instance = self.settings_model(**settings_values)
@@ -63,7 +63,7 @@ class SettingsManager:
                 self.set_warnings(err)
 
     def reset(self):
-        with ConfigResetError.handle_errors("Failed to reset settings"):
+        with SettingsResetError.handle_errors("Failed to reset settings"):
             try:
                 self.settings_instance = self.settings_model()
                 self.invalid_warnings = {}
@@ -92,12 +92,12 @@ class SettingsManager:
 
         if self.invalid_warnings:
             lines.append("")
-            lines.append(f"{red_}Configuration is invalid:{_red}")
+            lines.append(f"{red_}Settings are invalid:{_red}")
             lines.extend(f"{bold_}{k:>{max_field_len}}{_bold} -> {v}" for k, v in self.invalid_warnings.items())
 
         return "\n".join(lines)
 
     def save(self):
-        with ConfigSaveError.handle_errors(f"Failed to save settings to {self.settings_path}"):
+        with SettingsSaveError.handle_errors(f"Failed to save settings to {self.settings_path}"):
             self.settings_path.parent.mkdir(parents=True, exist_ok=True)
             self.settings_path.write_text(self.settings_instance.model_dump_json(indent=2))

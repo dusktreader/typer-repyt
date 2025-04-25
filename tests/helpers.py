@@ -10,6 +10,13 @@ from typer.testing import CliRunner
 runner = CliRunner()
 
 
+def strip_lineart(text: str) -> str:
+    lineart = ["╭", "─", "┬", "╮", "│", "├", "┼", "┤", "╰", "┴", "╯", "└"]
+    for char in lineart:
+        text = text.replace(char, "")
+    return text
+
+
 def get_output(
     cli: typer.Typer,
     *args: str,
@@ -59,7 +66,7 @@ def check_output(
     elif isinstance(expected_substring, str):
         expected_substring = [expected_substring]
     for es in expected_substring:
-        assert es in output, output
+        assert es in output, build_substring_fail_message(es, output)
 
 
 def check_help(cli: typer.Typer, **kwargs: Any):
@@ -72,6 +79,8 @@ def match_output(
     expected_pattern: str | list[str] | None = None,
     negative_pattern: bool = False,
     enforce_order: bool = True,
+    escape_parens: bool = False,
+    escape_brackets: bool = False,
     **kwargs: Any,
 ):
     output = get_output(cli, *args, **kwargs)
@@ -83,14 +92,14 @@ def match_output(
     start_positions: list[int] = []
     for ep in expected_pattern:
         mangled_pattern = ep
-        mangled_pattern = strip_whitespace(mangled_pattern)
+        mangled_pattern = strip_lineart(strip_whitespace(mangled_pattern))
+        if escape_parens:
+            mangled_pattern = mangled_pattern.replace("(", r"\(").replace(")", r"\)")
+        if escape_brackets:
+            mangled_pattern = mangled_pattern.replace("[", r"\[").replace("]", r"\]")
 
         mangled_output = output
-        mangled_output = strip_whitespace(mangled_output)
-
-        rounded = ["╭", "─", "┬", "╮", "│", "├", "┼", "┤", "╰", "┴", "╯"]
-        for char in rounded:
-            mangled_output = mangled_output.replace(char, "")
+        mangled_output = strip_lineart(strip_whitespace(mangled_output))
 
         match: re.Match[str] | None = re.search(mangled_pattern, mangled_output)
         if match is not None:
@@ -170,6 +179,25 @@ def build_exception_pattern_message(
 
         Expected {exception_pattern}
         Computed {exception}
+
+        Output:
+        {indent(output, prefix="            ", skip_first_line=True)}
+        """
+    )
+
+
+def build_substring_fail_message(
+    substring: str,
+    output: str,
+    negative_match: bool = False,
+) -> str:
+    qualifier = "was not found" if not negative_match else "WAS FOUND"
+    return dedent(
+        f"""
+        Substring {qualifier} in output
+
+        Substring:
+        {substring}
 
         Output:
         {indent(output, prefix="            ", skip_first_line=True)}

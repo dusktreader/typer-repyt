@@ -36,6 +36,7 @@ nav:
   - Features:
     - Dynamic Commands: features/build_command.md
     - Settings: features/settings.md
+    - Cache: features/cache.md
   - Reference: reference.md
 plugins:
   search:

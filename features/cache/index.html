@@ -14,7 +14,7 @@
         <link rel="prev" href="../settings/">
       
       
-        <link rel="next" href="../../reference/">
+        <link rel="next" href="../exceptions/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -344,29 +344,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../build_command/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Dynamic Commands
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../settings/" class="md-nav__link">
         
   
@@ -589,9 +566,77 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Error Handling
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../build_command/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dynamic Commands
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Runnable Demo
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -1047,7 +1092,7 @@ whole cache out if you run it without a specific path:</p>
 </span></code></pre></div>
 <p>Note that you have to confirm whenever you request to clear the entire cache to prevent accidental deletion.</p>
 <h2 id="details">Details</h2>
-<p>Let's take a closer look at the details of each <code>cache</code> subcommand and the methos of the <code>CacheManager</code>:</p>
+<p>Let's take a closer look at the details of each <code>cache</code> subcommand and the methods of the <code>CacheManager</code>:</p>
 <h3 id="clear"><code>clear</code></h3>
 <p>The <code>clear</code> command gives you the ability to remove items from the cache. You can target a specific entry in the cache
 by passing it a specific path using the <code>--path</code> option. If the item is not found in the cache at that location, an
@@ -1080,41 +1125,41 @@ directory (to prevent sneaky use of <code>..</code>).</p>
 permissions of the cache entry. So, for example, if you want only your user to be able to read and write to the entry,
 you might use a <code>mode</code> of <code>0o600</code>.</p>
 <p>Function signature:</p>
-<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-9-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a>        <span class="k">if</span> <span class="n">mode</span><span class="p">:</span>
+<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-9-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a>            <span class="k">with</span> <span class="n">CacheStoreError</span><span class="o">.</span><span class="n">handle_errors</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to set mode for cache target </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">mode</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">):</span>
 </span></code></pre></div></td></tr></table></div>
 <h3 id="cachemanagerstore_text"><code>CacheManager.store_text()</code></h3>
 <p>This method stores text data in a cache target. It can also be given a <code>mode</code> parameter.</p>
 <p>Function signature:</p>
-<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-10-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">store_bytes</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-10-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a>
 </span></code></pre></div></td></tr></table></div>
 <h3 id="cachemanagerstore_json"><code>CacheManager.store_json()</code></h3>
 <p>This method stores a dictionary of data in a cache target. The dictionary must be JSON serializable or an error will be
 thrown. The JSON written to the file is formatted to be human readable. This method can also be provided a <code>mode</code>
 parameter.</p>
 <p>Function signature:</p>
-<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-11-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a>        <span class="n">full_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mkdir</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-11-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a>        <span class="n">CacheLoadError</span><span class="o">.</span><span class="n">require_condition</span><span class="p">(</span><span class="n">full_path</span><span class="o">.</span><span class="n">exists</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">&quot;Cache target </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
 </span></code></pre></div></td></tr></table></div>
 <h3 id="cachemanagerload_bytes"><code>CacheManager.load_bytes()</code></h3>
 <p>This method loads binary data from a cache target. If the cache target does not exist, an error will be thrown.</p>
-<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-12-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a>            <span class="k">return</span> <span class="n">full_path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span>
+<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-12-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a>
 </span></code></pre></div></td></tr></table></div>
 <h3 id="cachemanagerload_text"><code>CacheManager.load_text()</code></h3>
 <p>This method loads text data from a cache target. If the cache target does not exist, an error will be thrown.</p>
-<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-13-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a>        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_bytes</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-13-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a>        <span class="k">with</span> <span class="n">CacheLoadError</span><span class="o">.</span><span class="n">handle_errors</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to unpack JSON data from cache target </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">):</span>
 </span></code></pre></div></td></tr></table></div>
 <h3 id="cachemanagerload_json"><code>CacheManager.load_json()</code></h3>
 <p>This method loads a JSON serialized dictionary from a cache target. If the cache target does not exist, an error will be
 thrown. If the data at the cache target cannot be serialized, an error will be thrown.</p>
-<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-14-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1"></a>
+<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-14-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">clear_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
 </span></code></pre></div></td></tr></table></div>
 <h3 id="cachemanagerclear_path"><code>CacheManager.clear_path()</code></h3>
 <p>This method removes an entry from the cache at the provided target. If the target does not exist, an error will be
 thrown. If the parent directory of the entry is empty after it is removed, the parent directory will be removed as well.</p>
-<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-15-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">full_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-15-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1"></a>            <span class="k">with</span> <span class="n">CacheClearError</span><span class="o">.</span><span class="n">handle_errors</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to remove empty directory </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">full_path</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">):</span>
 </span></code></pre></div></td></tr></table></div>
 <h3 id="cachemanagerclear_all"><code>CacheManager.clear_all()</code></h3>
 <p>This method will remove all items from the cache.</p>
-<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-16-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">pretty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CacheInfo</span><span class="p">:</span>
+<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-16-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1"></a>        <span class="k">return</span> <span class="n">render_directory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="p">)</span>
 </span></code></pre></div></td></tr></table></div>
 <h3 id="cachemanagerpretty"><code>CacheManager.pretty()</code></h3>
 <p>This (poorly named) method gathers information about the cache and returns it in a format that can be pretty-printed by
@@ -1167,13 +1212,13 @@ the <code>@attach_cache</code> decorator.</p>
         
         
           
-          <a href="../../reference/" class="md-footer__link md-footer__link--next" aria-label="Next: Reference">
+          <a href="../exceptions/" class="md-footer__link md-footer__link--next" aria-label="Next: Error Handling">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Reference
+                Error Handling
               </div>
             </div>
             <div class="md-footer__button md-icon">

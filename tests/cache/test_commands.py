@@ -3,10 +3,10 @@ from pathlib import Path
 import typer
 
 from typer_repyt.cache.commands import add_clear, add_show, add_cache_subcommand
-from typer_repyt.cache.exceptions import CacheError
 from typer_repyt.cache.manager import CacheManager
 
 from tests.helpers import match_help, match_output
+from typer_repyt.constants import ExitCode
 
 
 class TestClear:
@@ -34,9 +34,8 @@ class TestClear:
         match_output(
             cli,
             "--path=jawa/ewok.txt",
-            exit_code=1,
-            exception_type=CacheError,
-            exception_pattern="Failed to clear cache target jawa/ewok.txt",
+            exit_code=ExitCode.GENERAL_ERROR,
+            expected_pattern="Failed to clear cache target jawa/ewok.txt",
             prog_name="test",
         )
 

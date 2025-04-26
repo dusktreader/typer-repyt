@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 from typer_repyt.build_command import DecDef, build_command, OptDef
 from typer_repyt.constants import Sentinel, Validation
+from typer_repyt.exceptions import handle_errors
 from typer_repyt.settings.attach import get_manager, attach_settings
 from typer_repyt.settings.exceptions import SettingsError
 from typer_repyt.settings.manager import SettingsManager
@@ -39,6 +40,15 @@ def add_bind(cli: typer.Typer, settings_model: type[BaseModel]):
         bind,
         *opt_defs,
         decorators=[
+            DecDef(
+                dec_func=handle_errors,
+                dec_args=["Failed to bind settings"],
+                dec_kwargs=dict(
+                    handle_exc_class=SettingsError,
+                    unwrap_message=False,
+                ),
+                is_simple=False,
+            ),
             DecDef(
                 dec_func=attach_settings,
                 dec_args=[settings_model],
@@ -79,6 +89,15 @@ def add_update(cli: typer.Typer, settings_model: type[BaseModel]):
         *opt_defs,
         decorators=[
             DecDef(
+                dec_func=handle_errors,
+                dec_args=["Failed to update settings"],
+                dec_kwargs=dict(
+                    handle_exc_class=SettingsError,
+                    unwrap_message=False,
+                ),
+                is_simple=False,
+            ),
+            DecDef(
                 dec_func=attach_settings,
                 dec_args=[settings_model],
                 dec_kwargs=dict(validation=Validation.NONE, persist=True, show=True),
@@ -116,6 +135,15 @@ def add_unset(cli: typer.Typer, settings_model: type[BaseModel]):
         *opt_defs,
         decorators=[
             DecDef(
+                dec_func=handle_errors,
+                dec_args=["Failed to unset settings"],
+                dec_kwargs=dict(
+                    handle_exc_class=SettingsError,
+                    unwrap_message=False,
+                ),
+                is_simple=False,
+            ),
+            DecDef(
                 dec_func=attach_settings,
                 dec_args=[settings_model],
                 dec_kwargs=dict(validation=Validation.NONE, persist=True, show=True),
@@ -135,6 +163,15 @@ def add_show(cli: typer.Typer, settings_model: type[BaseModel]):
         cli,
         show,
         decorators=[
+            DecDef(
+                dec_func=handle_errors,
+                dec_args=["Failed to show settings"],
+                dec_kwargs=dict(
+                    handle_exc_class=SettingsError,
+                    unwrap_message=False,
+                ),
+                is_simple=False,
+            ),
             DecDef(
                 dec_func=attach_settings,
                 dec_args=[settings_model],
@@ -157,6 +194,15 @@ def add_reset(cli: typer.Typer, settings_model: type[BaseModel]):
         cli,
         reset,
         decorators=[
+            DecDef(
+                dec_func=handle_errors,
+                dec_args=["Failed to reset settings"],
+                dec_kwargs=dict(
+                    handle_exc_class=SettingsError,
+                    unwrap_message=False,
+                ),
+                is_simple=False,
+            ),
             DecDef(
                 dec_func=attach_settings,
                 dec_args=[settings_model],

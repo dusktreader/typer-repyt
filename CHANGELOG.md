@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## v0.6.0 - 2025-04-25
+- Completed error handling including:
+ - the `@handle_errors` decorator
+ - adding `@handle_errors` to cache and settings commands
+- Added documentation for error handling
+- Added a demo for error handling
+
 ## v0.5.0 - 2025-04-24
 - Completed the `cache` functionality including:
   - the `@attach_cache` decorator

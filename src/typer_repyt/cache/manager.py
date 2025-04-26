@@ -11,7 +11,6 @@ from rich.tree import Tree
 from typer_repyt.cache.exceptions import (
     CacheClearError,
     CacheError,
-    CacheFreeError,
     CacheInitError,
     CacheLoadError,
     CacheStoreError,
@@ -153,10 +152,10 @@ class CacheManager:
 
     def clear_path(self, path: Path | str) -> Path:
         full_path = self.resolve_path(path)
-        with CacheFreeError.handle_errors(f"Failed to clear cache target {str(path)}"):
+        with CacheClearError.handle_errors(f"Failed to clear cache target {str(path)}"):
             full_path.unlink()
         if len([p for p in full_path.parent.iterdir()]) == 0:
-            with CacheFreeError.handle_errors(f"Failed to remove empty directory {str(full_path.parent)}"):
+            with CacheClearError.handle_errors(f"Failed to remove empty directory {str(full_path.parent)}"):
                 full_path.parent.rmdir()
         return full_path
 

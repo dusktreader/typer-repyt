@@ -58,15 +58,20 @@ def check_output(
     cli: typer.Typer,
     *args: str,
     expected_substring: str | list[str] | None = None,
+    unwanted_substring: str | list[str] | None = None,
     **kwargs: Any,
 ):
     output = get_output(cli, *args, **kwargs)
-    if not expected_substring:
-        return
-    elif isinstance(expected_substring, str):
-        expected_substring = [expected_substring]
-    for es in expected_substring:
-        assert es in output, build_substring_fail_message(es, output)
+    if expected_substring:
+        if isinstance(expected_substring, str):
+            expected_substring = [expected_substring]
+        for es in expected_substring:
+            assert es in output, build_substring_fail_message(es, output)
+    if unwanted_substring:
+        if isinstance(unwanted_substring, str):
+            unwanted_substring = [unwanted_substring]
+        for us in unwanted_substring:
+            assert us not in output, build_substring_fail_message(us, output, negative_match=True)
 
 
 def check_help(cli: typer.Typer, **kwargs: Any):
@@ -77,45 +82,62 @@ def match_output(
     cli: typer.Typer,
     *args: str,
     expected_pattern: str | list[str] | None = None,
-    negative_pattern: bool = False,
+    unwanted_pattern: str | list[str] | None = None,
     enforce_order: bool = True,
     escape_parens: bool = False,
     escape_brackets: bool = False,
     **kwargs: Any,
 ):
     output = get_output(cli, *args, **kwargs)
-    if not expected_pattern:
-        return
-    elif isinstance(expected_pattern, str):
-        expected_pattern = [expected_pattern]
+    if expected_pattern:
+        if isinstance(expected_pattern, str):
+            expected_pattern = [expected_pattern]
 
-    start_positions: list[int] = []
-    for ep in expected_pattern:
-        mangled_pattern = ep
-        mangled_pattern = strip_lineart(strip_whitespace(mangled_pattern))
-        if escape_parens:
-            mangled_pattern = mangled_pattern.replace("(", r"\(").replace(")", r"\)")
-        if escape_brackets:
-            mangled_pattern = mangled_pattern.replace("[", r"\[").replace("]", r"\]")
+        start_positions: list[int] = []
+        for ep in expected_pattern:
+            mangled_pattern = ep
+            mangled_pattern = strip_lineart(strip_whitespace(mangled_pattern))
+            if escape_parens:
+                mangled_pattern = mangled_pattern.replace("(", r"\(").replace(")", r"\)")
+            if escape_brackets:
+                mangled_pattern = mangled_pattern.replace("[", r"\[").replace("]", r"\]")
 
-        mangled_output = output
-        mangled_output = strip_lineart(strip_whitespace(mangled_output))
+            mangled_output = output
+            mangled_output = strip_lineart(strip_whitespace(mangled_output))
 
-        match: re.Match[str] | None = re.search(mangled_pattern, mangled_output)
-        if match is not None:
-            start_positions.append(match.start())
+            match: re.Match[str] | None = re.search(mangled_pattern, mangled_output)
+            if match is not None:
+                start_positions.append(match.start())
 
-        did_match = match is not None
-        if negative_pattern:
-            did_match = not did_match
-        assert did_match, build_pattern_fail_message(
-            ep, mangled_pattern, output, mangled_output, negative_pattern=negative_pattern
-        )
+            assert match, build_pattern_fail_message(ep, mangled_pattern, output, mangled_output)
 
-    if enforce_order:
-        assert all(left <= right for (left, right) in pairwise(start_positions)), build_order_fail_message(
-            expected_pattern, start_positions, output
-        )
+        if enforce_order:
+            assert all(left <= right for (left, right) in pairwise(start_positions)), build_order_fail_message(
+                expected_pattern, start_positions, output
+            )
+
+    if unwanted_pattern:
+        if isinstance(unwanted_pattern, str):
+            unwanted_pattern = [unwanted_pattern]
+
+        for up in unwanted_pattern:
+            mangled_pattern = up
+            mangled_pattern = strip_lineart(strip_whitespace(mangled_pattern))
+            if escape_parens:
+                mangled_pattern = mangled_pattern.replace("(", r"\(").replace(")", r"\)")
+            if escape_brackets:
+                mangled_pattern = mangled_pattern.replace("[", r"\[").replace("]", r"\]")
+
+            mangled_output = output
+            mangled_output = strip_lineart(strip_whitespace(mangled_output))
+
+            assert not re.search(mangled_pattern, mangled_output), build_pattern_fail_message(
+                up,
+                mangled_pattern,
+                output,
+                mangled_output,
+                negative_pattern=True,
+            )
 
 
 def match_help(

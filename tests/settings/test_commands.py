@@ -3,8 +3,8 @@ from pathlib import Path
 
 import typer
 
+from typer_repyt.constants import ExitCode
 from typer_repyt.settings.commands import add_bind, add_reset, add_settings_subcommand, add_show, add_unset, add_update
-from typer_repyt.settings.exceptions import SettingsError
 
 from tests.helpers import match_help, match_output
 from tests.settings.models import DefaultSettingsModel, RequiredFieldsModel
@@ -51,9 +51,13 @@ class TestBind:
             "--name=hutt",
             "--planet=nal hutta",
             "--alignment=invalid-alignment",
-            exit_code=1,
-            exception_type=SettingsError,
-            exception_pattern="Final settings are invalid",
+            exit_code=ExitCode.GENERAL_ERROR,
+            expected_pattern=[
+                "Failed to bind settings",
+                "Final settings are invalid",
+                "RequiredFieldsModel",
+                "invalid-alignment is an invalid alignment",
+            ],
             prog_name="test",
         )
 
@@ -266,8 +270,7 @@ class TestShow:
         ]
         match_help(
             cli,
-            expected_pattern=expected_pattern,
-            negative_pattern=True,
+            unwanted_pattern=expected_pattern,
             prog_name="test",
         )
 
@@ -324,8 +327,7 @@ class TestReset:
         ]
         match_help(
             cli,
-            expected_pattern=expected_pattern,
-            negative_pattern=True,
+            unwanted_pattern=expected_pattern,
             prog_name="test",
         )
 

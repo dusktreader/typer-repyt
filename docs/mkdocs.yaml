@@ -34,9 +34,11 @@ nav:
   - Home: index.md
   - Quickstart: quickstart.md
   - Features:
-    - Dynamic Commands: features/build_command.md
     - Settings: features/settings.md
     - Cache: features/cache.md
+    - Error Handling: features/exceptions.md
+    - Dynamic Commands: features/build_command.md
+  - Runnable Demo: demo.md
   - Reference: reference.md
 plugins:
   search:

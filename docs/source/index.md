@@ -12,13 +12,15 @@ _Tools to extended functionality for typer based CLIs_
     I'm looking for a job right now! If you know of any openings that match my skill-set, please let me know! You can
     read my resume over at my [cv site](https://cv.dusktreader.dev). Thanks!
 
+
 ## Overview
 
 This Python package adds extended functionality for Typer CLIs.
 
 Many features are planned, but these are the ones that are available thus far:
 
-- [Building Commands Dynamically](features/build_command.md)
 - [Settings management & commands](features/settings.md)
 - [Cache management & commands](features/cache.md)
+- [User-friendly error handling](features/exceptions.md)
+- [Building Commands Dynamically](features/build_command.md)
 

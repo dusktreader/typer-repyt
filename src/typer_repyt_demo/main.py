@@ -18,6 +18,7 @@ class Feature(AutoNameEnum):
     settings_commands = auto()
     attach_cache = auto()
     cache_commands = auto()
+    handle_errors = auto()
 
 
 def start(

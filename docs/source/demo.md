@@ -1,7 +1,7 @@
 # Demo
 
 The `typer-repyt` package includes an "extra" that can be installed to show all its features. Each demo focuses on a
-particular feature and runs an examples that demonstrates how they can be used in your CLI app.
+particular feature and runs a few examples that demonstrate how the feature can be used in your CLI app.
 
 
 ## Installation

@@ -15,7 +15,7 @@ _Build Typer commands dynamically_
 
 ## Overview
 
-This Python package profides a mechanism to dynamically build Typer commands. It includes support for Options,
+This Python package provides a mechanism to dynamically build Typer commands. It includes support for Options,
 Arguments, the Typer context, and decorators.
 
 Read more in [Build Commands Dynamically](build_command.md).

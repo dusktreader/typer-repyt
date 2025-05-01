@@ -4,7 +4,7 @@
 # typer-repyt
 
 
-_Tools to extended functionality for typer based CLIs_
+_Build Typer commands dynamically_
 
 
 !!!warning "Open to work"
@@ -15,12 +15,7 @@ _Tools to extended functionality for typer based CLIs_
 
 ## Overview
 
-This Python package adds extended functionality for Typer CLIs.
+This Python package provides a mechanism to dynamically build Typer commands. It includes support for Options,
+Arguments, the Typer context, and decorators.
 
-Many features are planned, but these are the ones that are available thus far:
-
-- [Settings management & commands](features/settings.md)
-- [Cache management & commands](features/cache.md)
-- [User-friendly error handling](features/exceptions.md)
-- [Building Commands Dynamically](features/build_command.md)
-
+Read more in [Build Commands Dynamically](build_command.md).

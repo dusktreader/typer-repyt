@@ -1,9 +1,9 @@
+from enum import StrEnum, auto
 from typing import Annotated
 from collections.abc import Callable
 
 import snick
 import typer
-from auto_name_enum import AutoNameEnum, auto
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
@@ -12,13 +12,8 @@ from rich.prompt import Confirm
 from typer_repyt_demo.helpers import run_demo, get_demo_functions
 
 
-class Feature(AutoNameEnum):
+class Feature(StrEnum):
     build_command = auto()
-    attach_settings = auto()
-    settings_commands = auto()
-    attach_cache = auto()
-    cache_commands = auto()
-    handle_errors = auto()
 
 
 def start(

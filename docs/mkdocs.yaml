@@ -33,11 +33,7 @@ watch:
 nav:
   - Home: index.md
   - Quickstart: quickstart.md
-  - Features:
-    - Settings: features/settings.md
-    - Cache: features/cache.md
-    - Error Handling: features/exceptions.md
-    - Dynamic Commands: features/build_command.md
+  - Build Commands Dynamically: build_command.md
   - Runnable Demo: demo.md
   - Reference: reference.md
 plugins:
@@ -47,8 +43,9 @@ plugins:
     default_handler: python
     handlers:
       python:
-        paths: [..]
+        paths: [../src/typer_repyt]
         options:
+          summary: true
           heading_level: 3
           show_root_heading: true
           separate_signature: true

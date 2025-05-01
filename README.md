@@ -11,15 +11,7 @@
 
 ![typer-repyt-logo](https://github.com/dusktreader/typer-repyt/blob/main/docs/source/images/logo-dark.png)
 
-_Tools to extended functionality for typer based CLIs_
-
-
-## Features
-
-- [Settings management & commands](https://dusktreader.github.io/typer-repyt/features/settings)
-- [Cache management & commands](https://dusktreader.github.io/typer-repyt/features/cache)
-- [User-friendly error handling](https://dusktreader.github.io/typer-repyt/features/exceptions)
-- [Building Commands Dynamically](https://dusktreader.github.io/typer-repyt/features/build_command)
+_Build Typer commands dynamically_
 
 
 ## Super-quick Start

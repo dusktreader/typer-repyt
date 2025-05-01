@@ -127,11 +127,13 @@ def build_command(
         '''
         print(f"{dyna1=}, {dyna2=}, {mite1=}, {mite2=}")
 
+
     def dynamic(dyna1: str, dyna2: int, mite1: str, mite2: int | None):
         '''
         Just prints values of passed params
         '''
         print(f"{dyna1=}, {dyna2=}, {mite1=}, {mite2=}")
+
 
     build_command(
         cli,

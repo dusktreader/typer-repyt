@@ -1,5 +1,5 @@
 import ast
-from functools import reduce, update_wrapper
+from functools import update_wrapper
 import inspect
 import textwrap
 from collections.abc import Callable
@@ -213,20 +213,21 @@ def build_command(
         else:
             raise BuildCommandError(f"Unsupported parameter definition type: {type(param_def)}")
 
-        # Get the type annotation for the opt/arg
+        # Get the type annotation for the opt/arg and make sure the names are included in the final namespace
         # Just found out that I didn't need to do this (yet) because Typer does not support Union types
         # I will keep it here in case it does soon: https://github.com/fastapi/typer/pull/1148
         type_expr: ast.Name | ast.BinOp
         if isinstance(param_def.param_type, UnionType):
 
-            def bitor(left: ast.expr | type[Any], right: type[Any]) -> ast.BinOp:
-                if not isinstance(left, ast.expr):
-                    left = ast.Name(id=left.__name__)
-                return ast.BinOp(left=left, op=ast.BitOr(), right=ast.Name(id=right.__name__))
-
-            type_expr = reduce(bitor, param_def.param_type.__args__)
+            (first, *rest) = param_def.param_type.__args__
+            type_expr = ast.Name(id=first.__name__)
+            namespace[first.__name__] = first
+            for arg in rest:
+                type_expr = ast.BinOp(left=type_expr, op=ast.BitOr(), right=ast.Name(id=arg.__name__))
+                namespace[arg.__name__] = arg
         else:
             type_expr = ast.Name(id=param_def.param_type.__name__)
+            namespace[param_def.param_type.__name__] = param_def.param_type
 
         # Create the actual Annotated element using func, args, and keywords assembled above
         param_attr = "Option" if isinstance(param_def, OptDef) else "Argument"

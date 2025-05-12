@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## v0.7.1 - 2025-05-12
+- Made sure args were added to the namespace to avoid NameErrors for enum types
+
+
 ## v0.7.0 - 2025-05-01
 - Pared back functionality to _just_ the `build_command` feature
 - All other features are being ported to the new `typerspace` package

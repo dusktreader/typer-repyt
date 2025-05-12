@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from enum import StrEnum, auto
 from functools import wraps
 from typing import Any, Annotated
 
@@ -574,3 +575,28 @@ def test_build_command__raises_error_on_unsupported_param_def():
 
     with pytest.raises(RepytError, match="Unsupported parameter definition type"):
         build_command(cli, dynamic, ParamDef(name="mite", param_type=str))
+
+
+def test_build_command__with_enum_param_type():
+    cli = typer.Typer()
+
+    class DynaChoice(StrEnum):
+        jawa = auto()
+        ewok = auto()
+
+    def dynamic(dyna: DynaChoice):
+        print(f"dyna={dyna.value}")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=DynaChoice),
+    )
+
+    match_output(
+        cli,
+        "--dyna=jawa",
+        expected_pattern=[
+            "dyna=jawa",
+        ],
+    )

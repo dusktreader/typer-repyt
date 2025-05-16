@@ -4,11 +4,6 @@
 [![Documentation Status](https://github.com/dusktreader/typer-repyt/actions/workflows/docs.yml/badge.svg)](https://dusktreader.github.io/typer-repyt/)
 
 
-> [!IMPORTANT]
-> I'm looking for a job right now! If you know of any openings that match my skill-set, please let me know! You can
-> read my resume over at my [cv site](https://cv.dusktreader.dev). Thanks!
-
-
 ![typer-repyt-logo](https://github.com/dusktreader/typer-repyt/blob/main/docs/source/images/logo-dark.png)
 
 _Build Typer commands dynamically_

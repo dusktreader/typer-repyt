@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## v0.7.2 - 2025-05-16
+- Fixed python version to allow 3.12 through 3.14
+
+
 ## v0.7.1 - 2025-05-12
 - Made sure args were added to the namespace to avoid NameErrors for enum types
 

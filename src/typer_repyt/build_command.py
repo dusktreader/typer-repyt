@@ -28,6 +28,7 @@ class ParamDef:
     help: str | None = None
     rich_help_panel: str | None = None
     show_default: bool | str = True
+    parser: Callable[[str], Any] | None = None
 
 
 @dataclass
@@ -170,6 +171,11 @@ def build_command(
             ast.keyword(arg="rich_help_panel", value=ast.Constant(value=param_def.rich_help_panel)),
             ast.keyword(arg="show_default", value=ast.Constant(value=param_def.show_default)),
         ]
+
+        # If the ParamDef has a perser, add it to the keywords
+        if param_def.parser:
+            keywords.append(ast.keyword(arg="parser", value=ast.Name(param_def.parser.__name__)))
+            namespace[param_def.parser.__name__] = param_def.parser
 
         # If the ParamDef is an OptDef, assemble args and keywords for it
         if isinstance(param_def, OptDef):

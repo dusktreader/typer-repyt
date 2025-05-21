@@ -1,9 +1,11 @@
 from collections.abc import Callable
 from enum import StrEnum, auto
 from functools import wraps
+import json
 from typing import Any, Annotated
 
 import pytest
+import pydantic
 import typer
 
 from typer_repyt.build_command import build_command, OptDef, ArgDef, ParamDef, DecDef
@@ -316,6 +318,28 @@ def test_build_command__option__callback():
     check_output(cli, "--dyna=ZOOM", expected_substring=["dyna='ZOOM'", "val='ZOOM'"])
 
 
+def test_build_command__option__parser():
+    cli = typer.Typer()
+
+    class Dyna(pydantic.BaseModel):
+        c4: str
+        semtex: int
+
+    def parser(val: Any) -> Dyna:
+        return Dyna(**json.loads(val))
+
+    def dynamic(dyna: Dyna):
+        print(f"{dyna=}")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=str, parser=parser),
+    )
+
+    check_output(cli, """--dyna={"c4": "boom", "semtex": 13}""", expected_substring=["dyna=Dyna(c4='boom', semtex=13)"])
+
+
 def test_build_command__option__is_eager():
     cli = typer.Typer()
 
@@ -419,6 +443,28 @@ def test_build_command__argument__hidden():
     match_output(cli, expected_pattern="Error.*Missing argument 'MITE'", exit_code=2)
     check_output(cli, "BOOM", expected_substring="mite='BOOM'")
     check_output(cli, "--help", expected_substring=None)
+
+
+def test_build_command__argument__parser():
+    cli = typer.Typer()
+
+    class Dyna(pydantic.BaseModel):
+        c4: str
+        semtex: int
+
+    def parser(val: Any) -> Dyna:
+        return Dyna(**json.loads(val))
+
+    def dynamic(dyna: Dyna):
+        print(f"{dyna=}")
+
+    build_command(
+        cli,
+        dynamic,
+        ArgDef(name="dyna", param_type=str, parser=parser),
+    )
+
+    check_output(cli, """{"c4": "boom", "semtex": 13}""", expected_substring=["dyna=Dyna(c4='boom', semtex=13)"])
 
 
 def test_build_command__argument__envvar__single():

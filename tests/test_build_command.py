@@ -318,6 +318,22 @@ def test_build_command__option__callback():
     check_output(cli, "--dyna=ZOOM", expected_substring=["dyna='ZOOM'", "val='ZOOM'"])
 
 
+def test_build_command__option__metavar():
+    cli = typer.Typer()
+
+    def dynamic(dyna: str):
+        print(f"{dyna=}")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=str, metavar="NITRO"),
+    )
+
+    check_output(cli, "--dyna=BOOM", expected_substring="dyna='BOOM'")
+    match_help(cli, expected_pattern=r"dyna NITRO \[default: None\] \[required\]")
+
+
 def test_build_command__option__parser():
     cli = typer.Typer()
 
@@ -325,19 +341,32 @@ def test_build_command__option__parser():
         c4: str
         semtex: int
 
-    def parser(val: Any) -> Dyna:
+    def dyna_parser(val: Any) -> Dyna:
         return Dyna(**json.loads(val))
 
-    def dynamic(dyna: Dyna):
-        print(f"{dyna=}")
+    class Mite(pydantic.BaseModel):
+        blast_cord: bool
+        fuse: bool
+
+    def mite_parser(val: Any) -> Mite:
+        return Mite(**json.loads(val))
+
+    def dynamic(dyna: Dyna, mite: Mite):
+        print(f"{dyna=} {mite=}")
 
     build_command(
         cli,
         dynamic,
-        OptDef(name="dyna", param_type=str, parser=parser),
+        OptDef(name="dyna", param_type=str, parser=dyna_parser),
+        OptDef(name="mite", param_type=str, parser=mite_parser),
     )
 
-    check_output(cli, """--dyna={"c4": "boom", "semtex": 13}""", expected_substring=["dyna=Dyna(c4='boom', semtex=13)"])
+    check_output(
+        cli,
+        """--dyna={"c4": "boom", "semtex": 13}""",
+        """--mite={"blast_cord": true, "fuse": true}""",
+        expected_substring=["dyna=Dyna(c4='boom', semtex=13) mite=Mite(blast_cord=True, fuse=True)"]
+    )
 
 
 def test_build_command__option__is_eager():

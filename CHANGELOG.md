@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## v0.8.1 - 2025-05-22
+- Moved `metavar` into ParamDef
+
+
 ## v0.8.0 - 2025-05-20
 - Added parser kwarg for pydantic args/opts
 

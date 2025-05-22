@@ -282,6 +282,40 @@ $ python examples/param_def/show_default.py dynamic --help
     - [Typer: CLI Arguments with Help -- Custom default string](https://typer.tiangolo.com/tutorial/arguments/help/#custom-default-string){target="_blank"}
 
 
+#### `metavar`
+
+You may want to use some special text to be a placeholder in the `--help` text that describes the parameter. These are
+called "Meta Variables". For arguments, they show the type and where the argument should needs to be provided in the
+command. For options, the `metavar` describes the type.
+
+Have a look at the equivalent implementations in this example:
+
+```python {linenums="1"}
+--8<-- "examples/arg_def/metavar.py"
+```
+
+To see where the `metavar` comes in, check out the `--help` output:
+
+```
+$ python examples/arg_def/metavar.py dynamic --help
+
+ Usage: metavar.py dynamic [OPTIONS] NITRO
+
+╭─ Arguments ──────────────────────────────────────────────────────────────────────────────────╮
+│ *    mite      NITRO  [default: None] [required]                                             │
+╰──────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────────────────────╮
+│ --help          Show this message and exit.                                                  │
+╰──────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+You an see that it's used as a placeholder in the "Usage" string and again in the argument description.
+
+!!!abstract "Further reading"
+
+    - [Typer: CLI Arguments with Help -- Custom help name (metavar)](https://typer.tiangolo.com/tutorial/arguments/help/#custom-help-name-metavar){target="_blank"}
+
+
 ### `OptDef`
 
 `OptDef` is a the derived class that contains all the remaining parameters that can be passed to a Typer `Option`
@@ -527,39 +561,6 @@ Here is the signature of `ArgDef`:
 ```
 
 Here are what each of the attributes do.
-
-
-#### `metavar`
-
-You may want to use some special text to be a placeholder in the `--help` text that describes the `Argument`. These are
-called "Meta Variables". They help you see where the argument parameter needs to be provided in the command.
-
-Have a look at the equivalent implementations in this example:
-
-```python {linenums="1"}
---8<-- "examples/arg_def/metavar.py"
-```
-
-To see where the `metavar` comes in, check out the `--help` output:
-
-```
-$ python examples/arg_def/metavar.py dynamic --help
-
- Usage: metavar.py dynamic [OPTIONS] NITRO
-
-╭─ Arguments ──────────────────────────────────────────────────────────────────────────────────╮
-│ *    mite      NITRO  [default: None] [required]                                             │
-╰──────────────────────────────────────────────────────────────────────────────────────────────╯
-╭─ Options ────────────────────────────────────────────────────────────────────────────────────╮
-│ --help          Show this message and exit.                                                  │
-╰──────────────────────────────────────────────────────────────────────────────────────────────╯
-```
-
-You an see that it's used as a placeholder in the "Usage" string and again in the argument description.
-
-!!!abstract "Further reading"
-
-    - [Typer: CLI Arguments with Help -- Custom help name (metavar)](https://typer.tiangolo.com/tutorial/arguments/help/#custom-help-name-metavar){target="_blank"}
 
 
 #### `hidden`

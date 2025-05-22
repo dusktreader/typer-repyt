@@ -28,6 +28,7 @@ class ParamDef:
     help: str | None = None
     rich_help_panel: str | None = None
     show_default: bool | str = True
+    metavar: str | None = None
     parser: Callable[[str], Any] | None = None
 
 
@@ -52,7 +53,6 @@ class ArgDef(ParamDef):
     Define the additional components to build a Typer `Argument`.
     """
 
-    metavar: str | None = None
     hidden: bool = False
     envvar: str | list[str] | None = None
     show_envvar: bool = True
@@ -170,6 +170,7 @@ def build_command(
             ast.keyword(arg="help", value=ast.Constant(value=param_def.help)),
             ast.keyword(arg="rich_help_panel", value=ast.Constant(value=param_def.rich_help_panel)),
             ast.keyword(arg="show_default", value=ast.Constant(value=param_def.show_default)),
+            ast.keyword(arg="metavar", value=ast.Constant(value=param_def.metavar)),
         ]
 
         # If the ParamDef has a perser, add it to the keywords
@@ -199,7 +200,6 @@ def build_command(
         elif isinstance(param_def, ArgDef):
             keywords.extend(
                 [
-                    ast.keyword(arg="metavar", value=ast.Constant(value=param_def.metavar)),
                     ast.keyword(arg="hidden", value=ast.Constant(value=param_def.hidden)),
                     ast.keyword(arg="show_envvar", value=ast.Constant(value=param_def.show_envvar)),
                 ]

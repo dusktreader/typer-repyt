@@ -5,7 +5,7 @@ import textwrap
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any, cast, Literal
-from types import UnionType
+from types import FunctionType, UnionType
 
 from inflection import dasherize
 import typer
@@ -87,7 +87,7 @@ class DecDef:
 
 def build_command(
     cli: typer.Typer,
-    func: Callable[..., None],
+    func: FunctionType,
     /,
     *param_defs: ParamDef,
     decorators: list[DecDef] | None = None,
@@ -175,8 +175,9 @@ def build_command(
 
         # If the ParamDef has a perser, add it to the keywords
         if param_def.parser:
-            keywords.append(ast.keyword(arg="parser", value=ast.Name(param_def.parser.__name__)))
-            namespace[param_def.parser.__name__] = param_def.parser
+            parser_name = cast(FunctionType, param_def.parser).__name__
+            keywords.append(ast.keyword(arg="parser", value=ast.Name(parser_name)))
+            namespace[parser_name] = param_def.parser
 
         # If the ParamDef is an OptDef, assemble args and keywords for it
         if isinstance(param_def, OptDef):
@@ -185,8 +186,9 @@ def build_command(
             if param_def.short_name:
                 param_args.append(ast.Constant(value=f"-{param_def.short_name}"))
             if param_def.callback:
-                keywords.append(ast.keyword(arg="callback", value=ast.Name(param_def.callback.__name__)))
-                namespace[param_def.callback.__name__] = param_def.callback
+                callback_name = cast(FunctionType, param_def.callback).__name__
+                keywords.append(ast.keyword(arg="callback", value=ast.Name(callback_name)))
+                namespace[callback_name] = param_def.callback
             keywords.extend(
                 [
                     ast.keyword(arg="prompt", value=ast.Constant(value=param_def.prompt)),
@@ -224,7 +226,6 @@ def build_command(
         # I will keep it here in case it does soon: https://github.com/fastapi/typer/pull/1148
         type_expr: ast.Name | ast.BinOp
         if isinstance(param_def.param_type, UnionType):
-
             (first, *rest) = param_def.param_type.__args__
             type_expr = ast.Name(id=first.__name__)
             namespace[first.__name__] = first
@@ -289,15 +290,23 @@ def build_command(
     func_def = ast.FunctionDef(
         name=func.__name__,
         args=ast.arguments(
+            posonlyargs=[],
             args=args,
+            vararg=None,
             kwonlyargs=kwonlyargs,
             kw_defaults=kw_defaults,
+            kwarg=None,
+            defaults=[],
         ),
         body=body,
+        decorator_list=[],
+        returns=None,
+        type_comment=None,
+        type_params=[],
     )
 
     # Compile a module containing the imports and function definition
-    module = ast.Module(body=[*imports, func_def])
+    module = ast.Module(body=[*imports, func_def], type_ignores=[])
     _set_ast_location(module)
     code = compile(module, filename="<ast>", mode="exec")
 

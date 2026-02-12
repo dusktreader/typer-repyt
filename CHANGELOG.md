@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## v0.9.0 - 2026-02-11
+- Switched build backend from hatchling to uv_build
+- Replaced mypy and basedpyright with ty for type checking
+- Removed upper bounds from dependency version specifiers
+- Updated Makefile
+
+
 ## v0.8.1 - 2025-05-22
 - Moved `metavar` into ParamDef
 

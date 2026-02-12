@@ -11,7 +11,7 @@ _Build Typer commands dynamically_
 
 ## Super-quick Start
 
-Requires: Python 3.12 to 3.13
+Requires: Python 3.12 or greater
 
 Install through pip:
 

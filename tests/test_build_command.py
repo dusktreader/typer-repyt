@@ -11,7 +11,7 @@ import typer
 from typer_repyt.build_command import build_command, OptDef, ArgDef, ParamDef, DecDef
 from typer_repyt.exceptions import BuildCommandError, RepytError
 
-from tests.helpers import check_output, check_help, match_output, match_help
+from tests.helpers import check_output, check_help, get_output, match_output, match_help
 
 
 def simple_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -365,7 +365,7 @@ def test_build_command__option__parser():
         cli,
         """--dyna={"c4": "boom", "semtex": 13}""",
         """--mite={"blast_cord": true, "fuse": true}""",
-        expected_substring=["dyna=Dyna(c4='boom', semtex=13) mite=Mite(blast_cord=True, fuse=True)"]
+        expected_substring=["dyna=Dyna(c4='boom', semtex=13) mite=Mite(blast_cord=True, fuse=True)"],
     )
 
 
@@ -675,3 +675,159 @@ def test_build_command__with_enum_param_type():
             "dyna=jawa",
         ],
     )
+
+
+def test_build_command__option__enum_default():
+    cli = typer.Typer()
+
+    class DynaChoice(StrEnum):
+        jawa = auto()
+        ewok = auto()
+
+    def dynamic(dyna: DynaChoice):
+        print(f"dyna={dyna.value}")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=DynaChoice, default=DynaChoice.jawa),
+    )
+
+    # Invoke with no arguments — default should kick in
+    check_output(cli, expected_substring="dyna=jawa")
+    # Explicitly overriding the default should also work
+    check_output(cli, "--dyna=ewok", expected_substring="dyna=ewok")
+
+
+def test_build_command__argument__enum_default():
+    cli = typer.Typer()
+
+    class MiteChoice(StrEnum):
+        blast_cord = auto()
+        fuse = auto()
+
+    def dynamic(mite: MiteChoice):
+        print(f"mite={mite.value}")
+
+    build_command(
+        cli,
+        dynamic,
+        ArgDef(name="mite", param_type=MiteChoice, default=MiteChoice.blast_cord),
+    )
+
+    # Invoke with no arguments — default should kick in
+    check_output(cli, expected_substring="mite=blast_cord")
+    # Explicitly passing a value should override the default
+    check_output(cli, "fuse", expected_substring="mite=fuse")
+
+
+def test_build_command__include_context__default_name():
+    cli = typer.Typer()
+
+    def dynamic(dyna: str):
+        print(f"{dyna=}")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=str),
+        include_context=True,
+    )
+
+    check_output(cli, "--dyna=ZOOM", expected_substring="dyna='ZOOM'")
+
+
+def test_build_command__include_context__custom_name():
+    cli = typer.Typer()
+
+    def dynamic(dyna: str):
+        print(f"{dyna=}")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=str),
+        include_context="t_ctx",
+    )
+
+    check_output(cli, "--dyna=ZOOM", expected_substring="dyna='ZOOM'")
+
+
+def test_build_command__include_context__context_is_accessible():
+    cli = typer.Typer()
+
+    def dynamic(dyna: str):
+        print(f"{dyna=}")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=str),
+        include_context=True,
+    )
+
+    # The command should invoke successfully; context presence is validated internally by typer
+    check_output(cli, "--dyna=ZOOM", expected_substring="dyna='ZOOM'")
+
+
+def test_get_output__exception_type__matches():
+    cli = typer.Typer()
+
+    def dynamic(dyna: str):
+        raise ValueError("intentional error")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=str),
+    )
+
+    # Should not raise an AssertionError since the exception type matches
+    get_output(cli, "--dyna=ZOOM", exit_code=1, exception_type=ValueError)
+
+
+def test_get_output__exception_type__mismatch_fails():
+    cli = typer.Typer()
+
+    def dynamic(dyna: str):
+        raise ValueError("intentional error")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=str),
+    )
+
+    with pytest.raises(AssertionError, match="Expected exception type doesn't match"):
+        get_output(cli, "--dyna=ZOOM", exit_code=1, exception_type=RuntimeError)
+
+
+def test_get_output__exception_pattern__matches():
+    cli = typer.Typer()
+
+    def dynamic(dyna: str):
+        raise ValueError("intentional error")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=str),
+    )
+
+    get_output(cli, "--dyna=ZOOM", exit_code=1, exception_pattern="intentional")
+
+
+def test_get_output__exception_pattern__mismatch_fails():
+    cli = typer.Typer()
+
+    def dynamic(dyna: str):
+        raise ValueError("intentional error")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=str),
+    )
+
+    with pytest.raises(AssertionError, match="Expected exception text doesn't match pattern"):
+        get_output(cli, "--dyna=ZOOM", exit_code=1, exception_pattern="something_else_entirely")

@@ -1,4 +1,5 @@
 import ast
+import enum
 from functools import update_wrapper
 import inspect
 import textwrap
@@ -259,7 +260,11 @@ def build_command(
             args.append(arg)
         else:
             kwonlyargs.append(arg)
-            kw_defaults.append(ast.Constant(value=param_def.default))
+            kw_defaults.append(
+                ast.Constant(
+                    value=param_def.default.value if isinstance(param_def.default, enum.Enum) else param_def.default
+                )
+            )
 
     # Extract the function body from the template function
     source = textwrap.dedent(inspect.getsource(func)).strip()

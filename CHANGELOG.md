@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## v0.9.1 - 2026-03-12
+- Fixed enum member defaults by extracting `.value` before storing in the AST constant node
+- Added tests for enum member as default value for `OptDef` and `ArgDef`
+- Added tests for `include_context` parameter in `build_command`
+- Added tests for `exception_type` and `exception_pattern` parameters in `get_output` helper
+
+
 ## v0.9.0 - 2026-02-11
 - Switched build backend from hatchling to uv_build
 - Replaced mypy and basedpyright with ty for type checking

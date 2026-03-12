@@ -1287,14 +1287,12 @@ command.</p>
 <span class="normal"><a href="#__codelineno-3-3">3</a></span>
 <span class="normal"><a href="#__codelineno-3-4">4</a></span>
 <span class="normal"><a href="#__codelineno-3-5">5</a></span>
-<span class="normal"><a href="#__codelineno-3-6">6</a></span>
-<span class="normal"><a href="#__codelineno-3-7">7</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">build_command</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-3-6">6</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">build_command</span><span class="p">(</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a>    <span class="n">cli</span><span class="p">:</span> <span class="n">typer</span><span class="o">.</span><span class="n">Typer</span><span class="p">,</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a>    <span class="n">func</span><span class="p">:</span> <span class="n">FunctionType</span><span class="p">,</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a>    <span class="o">/</span><span class="p">,</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a>    <span class="o">*</span><span class="n">param_defs</span><span class="p">:</span> <span class="n">ParamDef</span><span class="p">,</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a>    <span class="n">decorators</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DecDef</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a>    <span class="n">include_context</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># TODO: Think about setting this automatically if func&#39;s first arg is ctx</span>
 </span></code></pre></div></td></tr></table></div>
 <p>The <code>cli</code> argument is the Typer app that you want your command added to.</p>
 <p>The <code>func</code> argument is a "template" function. The <code>build_command()</code> function builds a brand new function, but it borrows
@@ -1333,8 +1331,7 @@ context, Typer <em>requires</em> that it be the first positional argument and th
 <span class="normal"><a href="#__codelineno-4-10">10</a></span>
 <span class="normal"><a href="#__codelineno-4-11">11</a></span>
 <span class="normal"><a href="#__codelineno-4-12">12</a></span>
-<span class="normal"><a href="#__codelineno-4-13">13</a></span>
-<span class="normal"><a href="#__codelineno-4-14">14</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="nd">@dataclass</span>
+<span class="normal"><a href="#__codelineno-4-13">13</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="nd">@dataclass</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">ParamDef</span><span class="p">:</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><span class="sd">    Define the necessary components to build a Typer `Option` or `Argument`.</span>
@@ -1347,7 +1344,6 @@ context, Typer <em>requires</em> that it be the first positional argument and th
 </span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11"></a>    <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="n">Sentinel</span><span class="o">.</span><span class="n">NOT_GIVEN</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sentinel</span><span class="o">.</span><span class="n">NOT_GIVEN</span>
 </span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12"></a>    <span class="n">help</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13"></a>    <span class="n">rich_help_panel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14"></a>    <span class="n">show_default</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">True</span>
 </span></code></pre></div></td></tr></table></div>
 <p>Let's dig into what each attribute is used for.</p>
 <h4 id="name"><code>name</code></h4>
@@ -1837,17 +1833,21 @@ parameter.</p>
 <span class="normal"><a href="#__codelineno-17-8"> 8</a></span>
 <span class="normal"><a href="#__codelineno-17-9"> 9</a></span>
 <span class="normal"><a href="#__codelineno-17-10">10</a></span>
-<span class="normal"><a href="#__codelineno-17-11">11</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1"></a><span class="nd">@dataclass</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">OptDef</span><span class="p">(</span><span class="n">ParamDef</span><span class="p">):</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4"></a><span class="sd">    Define the additional components to build a Typer `Option`.</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6"></a>
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7"></a>    <span class="n">prompt</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8"></a>    <span class="n">confirmation_prompt</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9"></a>    <span class="n">hide_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10"></a>    <span class="n">override_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="__span-17-11"><a id="__codelineno-17-11" name="__codelineno-17-11"></a>    <span class="n">short_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="normal"><a href="#__codelineno-17-11">11</a></span>
+<span class="normal"><a href="#__codelineno-17-12">12</a></span>
+<span class="normal"><a href="#__codelineno-17-13">13</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1"></a>    <span class="n">parser</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2"></a>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3"></a>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4"></a><span class="nd">@dataclass</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5"></a><span class="k">class</span><span class="w"> </span><span class="nc">OptDef</span><span class="p">(</span><span class="n">ParamDef</span><span class="p">):</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7"></a><span class="sd">    Define the additional components to build a Typer `Option`.</span>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8"></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9"></a>
+</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10"></a>    <span class="n">prompt</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="__span-17-11"><a id="__codelineno-17-11" name="__codelineno-17-11"></a>    <span class="n">confirmation_prompt</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="__span-17-12"><a id="__codelineno-17-12" name="__codelineno-17-12"></a>    <span class="n">hide_input</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="__span-17-13"><a id="__codelineno-17-13" name="__codelineno-17-13"></a>    <span class="n">override_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </span></code></pre></div></td></tr></table></div>
 <p>Let's explore how each of these attributes work.</p>
 <h4 id="prompt"><code>prompt</code></h4>
@@ -2402,21 +2402,25 @@ The use-cases for eager callbacks aren't obvious, but you may find the need for 
 <p>Like <code>OptDef</code>, <code>ArgDef</code> is derived from the <code>ParamDef</code> class. It contains additional parameters that can only be passed
 to a Typer <code>Argument</code> parameter.</p>
 <p>Here is the signature of <code>ArgDef</code>:</p>
-<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-32-1">1</a></span>
-<span class="normal"><a href="#__codelineno-32-2">2</a></span>
-<span class="normal"><a href="#__codelineno-32-3">3</a></span>
-<span class="normal"><a href="#__codelineno-32-4">4</a></span>
-<span class="normal"><a href="#__codelineno-32-5">5</a></span>
-<span class="normal"><a href="#__codelineno-32-6">6</a></span>
-<span class="normal"><a href="#__codelineno-32-7">7</a></span>
-<span class="normal"><a href="#__codelineno-32-8">8</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1"></a><span class="nd">@dataclass</span>
-</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">ArgDef</span><span class="p">(</span><span class="n">ParamDef</span><span class="p">):</span>
-</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4"></a><span class="sd">    Define the additional components to build a Typer `Argument`.</span>
-</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6"></a>
-</span><span id="__span-32-7"><a id="__codelineno-32-7" name="__codelineno-32-7"></a>    <span class="n">hidden</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="__span-32-8"><a id="__codelineno-32-8" name="__codelineno-32-8"></a>    <span class="n">envvar</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-32-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-32-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-32-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-32-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-32-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-32-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-32-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-32-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-32-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-32-10">10</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1"></a>    <span class="n">is_eager</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2"></a>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3"></a>
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4"></a><span class="nd">@dataclass</span>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5"></a><span class="k">class</span><span class="w"> </span><span class="nc">ArgDef</span><span class="p">(</span><span class="n">ParamDef</span><span class="p">):</span>
+</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="__span-32-7"><a id="__codelineno-32-7" name="__codelineno-32-7"></a><span class="sd">    Define the additional components to build a Typer `Argument`.</span>
+</span><span id="__span-32-8"><a id="__codelineno-32-8" name="__codelineno-32-8"></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-32-9"><a id="__codelineno-32-9" name="__codelineno-32-9"></a>
+</span><span id="__span-32-10"><a id="__codelineno-32-10" name="__codelineno-32-10"></a>    <span class="n">hidden</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 </span></code></pre></div></td></tr></table></div>
 <p>Here are what each of the attributes do.</p>
 <h4 id="hidden"><code>hidden</code></h4>
@@ -2684,9 +2688,7 @@ to the original "template" funciton.</p>
 <span class="normal"><a href="#__codelineno-40-19">19</a></span>
 <span class="normal"><a href="#__codelineno-40-20">20</a></span>
 <span class="normal"><a href="#__codelineno-40-21">21</a></span>
-<span class="normal"><a href="#__codelineno-40-22">22</a></span>
-<span class="normal"><a href="#__codelineno-40-23">23</a></span>
-<span class="normal"><a href="#__codelineno-40-24">24</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1"></a><span class="nd">@dataclass</span>
+<span class="normal"><a href="#__codelineno-40-22">22</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1"></a><span class="nd">@dataclass</span>
 </span><span id="__span-40-2"><a id="__codelineno-40-2" name="__codelineno-40-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">DecDef</span><span class="p">:</span>
 </span><span id="__span-40-3"><a id="__codelineno-40-3" name="__codelineno-40-3"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="__span-40-4"><a id="__codelineno-40-4" name="__codelineno-40-4"></a><span class="sd">    Define a decorator function and it parameters.</span>
@@ -2708,8 +2710,6 @@ to the original "template" funciton.</p>
 </span><span id="__span-40-20"><a id="__codelineno-40-20" name="__codelineno-40-20"></a>                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dec_func</span><span class="p">(</span><span class="n">f</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </span><span id="__span-40-21"><a id="__codelineno-40-21" name="__codelineno-40-21"></a>            <span class="k">else</span><span class="p">:</span>
 </span><span id="__span-40-22"><a id="__codelineno-40-22" name="__codelineno-40-22"></a>                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dec_func</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dec_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">dec_kwargs</span><span class="p">)(</span><span class="n">f</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</span><span id="__span-40-23"><a id="__codelineno-40-23" name="__codelineno-40-23"></a>
-</span><span id="__span-40-24"><a id="__codelineno-40-24" name="__codelineno-40-24"></a>        <span class="n">update_wrapper</span><span class="p">(</span><span class="n">wrap</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 </span></code></pre></div></td></tr></table></div>
 <div class="admonition note">
 <p class="admonition-title">About <code>decorate()</code></p>

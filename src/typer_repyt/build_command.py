@@ -315,10 +315,23 @@ def build_command(
     _set_ast_location(module)
     code = compile(module, filename="<ast>", mode="exec")
 
-    # execute the compiled module
-    exec(code, func.__globals__, namespace)
+    # Execute the compiled module into a merged namespace so the compiled function's __globals__
+    # contains both the template function's globals and all the locally-defined annotation types.
+    # This is necessary for Python 3.14+ (PEP 649) where __annotate__ is a lazy closure that
+    # resolves names against __globals__ at evaluation time; without the merge, annotation types
+    # like Annotated, typer.Option, and user-defined models would cause NameError when
+    # inspect.signature(func, eval_str=True) is called later by typer.
+    # Use merged_globals as both the globals and locals dict for exec so that:
+    # 1. Module-level imports (Annotated, typer, Context, etc.) land in merged_globals.
+    # 2. The compiled function's __globals__ IS merged_globals, so __annotate__ can resolve
+    #    all annotation names at evaluation time (Python 3.14+ PEP 649).
+    merged_globals: dict[str, Any] = {**func.__globals__, **namespace}
+    exec(code, merged_globals)
 
-    command_func = namespace[func.__name__]
+    # Pin __signature__ now so inspect.signature() returns it directly and never needs to
+    # re-evaluate __annotate__ (which would still reference the un-merged __globals__).
+    command_func = merged_globals[func.__name__]
+    command_func.__signature__ = inspect.signature(command_func)
 
     # Add decorators to the command function
     if decorators is not None:

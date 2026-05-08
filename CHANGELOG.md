@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## v0.9.2 - 2026-05-07
+- Fixed Python 3.14 compatibility by supporting PEP 649 lazy annotation resolution in `build_command`
+- Upgraded pydantic to `>=2.13.3` for Python 3.14 wheel availability
+
+
 ## v0.9.1 - 2026-03-12
 - Fixed enum member defaults by extracting `.value` before storing in the AST constant node
 - Added tests for enum member as default value for `OptDef` and `ArgDef`

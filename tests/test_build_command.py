@@ -11,7 +11,7 @@ import typer
 from typer_repyt.build_command import build_command, OptDef, ArgDef, ParamDef, DecDef
 from typer_repyt.exceptions import BuildCommandError, RepytError
 
-from tests.helpers import check_output, check_help, get_output, match_output, match_help
+from tests.helpers import check_output, get_output, match_output, match_help
 
 
 def simple_decorator(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -227,8 +227,6 @@ def test_build_command__option__prompt__custom():
     match_help(cli, expected_pattern=r"--dyna TEXT \[default: None\] \[required\]")
 
 
-# TODO: Figure out how to fix this test
-@pytest.mark.skip("Passing input for confirmation prompt is not working")
 def test_build_command__option__confirmation_prompt():
     cli = typer.Typer()
 
@@ -241,8 +239,8 @@ def test_build_command__option__confirmation_prompt():
         OptDef(name="dyna", param_type=str, prompt=True, confirmation_prompt=True),
     )
 
-    check_output(cli, expected_substring=["Dyna: ZOOM", "dyna='ZOOM'"], input="ZOOM\nBOOM\n\n\n")
-    check_help(cli, expected_pattern=r"--dyna TEXT \[default: None\] \[required\]")
+    check_output(cli, expected_substring=["Dyna: ZOOM", "dyna='ZOOM'"], input="ZOOM\nZOOM\n")
+    match_help(cli, expected_pattern=r"--dyna TEXT \[default: None\] \[required\]")
 
 
 def test_build_command__option__hide_input():
@@ -831,3 +829,113 @@ def test_get_output__exception_pattern__mismatch_fails():
 
     with pytest.raises(AssertionError, match="Expected exception text doesn't match pattern"):
         get_output(cli, "--dyna=ZOOM", exit_code=1, exception_pattern="something_else_entirely")
+
+
+# ---------------------------------------------------------------------------
+# Python 3.14 PEP 649 annotation-resolution tests
+#
+# PEP 649 makes annotations lazy: a function's __annotate__ is a closure that
+# resolves names against __globals__ at evaluation time.  build_command compiles
+# a new function via exec(); these tests verify that all annotation types
+# (user-defined models, Union types, typer.Context) are resolvable without a
+# NameError when inspect.signature() evaluates them.
+# ---------------------------------------------------------------------------
+
+class _ExternalModel(pydantic.BaseModel):
+    """A model defined at module scope (outside the template function).
+
+    Its name must reach the compiled function's __globals__ via the
+    merged_globals mechanism introduced for Python 3.14.
+    """
+    value: str
+
+
+def test_build_command__py314_annotation__external_type_resolves():
+    """build_command must not raise NameError for types defined outside the template."""
+    import inspect
+
+    cli = typer.Typer()
+
+    def dynamic(dyna: _ExternalModel):
+        print(f"{dyna=}")
+
+    def parser(val: Any) -> _ExternalModel:
+        return _ExternalModel(value=val)
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=str, parser=parser),
+    )
+
+    # Locate the registered command function and force annotation evaluation.
+    # If merged_globals is missing _ExternalModel this raises NameError on 3.14.
+    registered = cli.registered_commands[0].callback
+    assert registered is not None
+    sig = inspect.signature(registered, eval_str=True)
+    assert "dyna" in sig.parameters
+
+
+def test_build_command__py314_annotation__union_type_resolves():
+    """int | None union annotations must resolve cleanly (NoneType in merged_globals)."""
+    import inspect
+
+    cli = typer.Typer()
+
+    def dynamic(mite: int | None):
+        print(f"{mite=}")
+
+    build_command(
+        cli,
+        dynamic,
+        ArgDef(name="mite", param_type=int | None, default=None),
+    )
+
+    registered = cli.registered_commands[0].callback
+    assert registered is not None
+    sig = inspect.signature(registered, eval_str=True)
+    assert "mite" in sig.parameters
+
+
+def test_build_command__py314_annotation__context_resolves():
+    """typer.Context must be resolvable in merged_globals when include_context=True."""
+    import inspect
+
+    cli = typer.Typer()
+
+    def dynamic(dyna: str):
+        print(f"{dyna=}")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=str),
+        include_context=True,
+    )
+
+    registered = cli.registered_commands[0].callback
+    assert registered is not None
+    sig = inspect.signature(registered, eval_str=True)
+    assert "ctx" in sig.parameters
+
+
+def test_build_command__py314_annotation__custom_context_name_resolves():
+    """typer.Context resolves when include_context is given a custom string name."""
+    import inspect
+
+    cli = typer.Typer()
+
+    def dynamic(dyna: str):
+        print(f"{dyna=}")
+
+    build_command(
+        cli,
+        dynamic,
+        OptDef(name="dyna", param_type=str),
+        include_context="t_ctx",
+    )
+
+    registered = cli.registered_commands[0].callback
+    assert registered is not None
+    sig = inspect.signature(registered, eval_str=True)
+    assert "t_ctx" in sig.parameters
